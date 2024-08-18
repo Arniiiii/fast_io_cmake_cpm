@@ -10,6 +10,10 @@ function(create_exe_default_benchmarks name source)
   cmake_language(CALL create_exe_default "BENCHMARKS" ${name} ${source})
 endfunction()
 
+function(create_library_default_benchmarks name source)
+  cmake_language(CALL create_library_default "BENCHMARKS" ${name} ${source})
+endfunction()
+
 function(link_qt_core name source)
   if(${QT5_FOUND})
     target_link_libraries(${name} PRIVATE Qt5::Core)
@@ -37,7 +41,7 @@ set(benchmarks_simple
     # 0002.file_io_tsc/longspaces/iobuf_file.cc
     # 0002.file_io_tsc/longspaces/iobuf_file_verify.cc
     0002.file_io_tsc/longspaces/stdio.cc
-    0002.file_io_tsc/longspaces/u32iobuf_file.cc
+    # 0002.file_io_tsc/longspaces/u32iobuf_file.cc # error: ‘char_type’ in ‘using fast_io::u32obuf_file = fast_io::basic_obuf_file<char32_t>’ {aka ‘class fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char32_t>, fast_io::open_mode::out>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::out, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, void, char32_t, 0, 32768> >’} does not name a type
     # 0002.file_io_tsc/longspaces/u32utf8_file.cc
     0002.file_io_tsc/random/c_file.cc
     0002.file_io_tsc/random/filebuf_file.cc
@@ -45,15 +49,15 @@ set(benchmarks_simple
     0002.file_io_tsc/random/stdio.cc
     0002.file_io_tsc/random/stream.cc
     0002.file_io_tsc/stdio_tsc.cc
-    0002.file_io_tsc/time/c_file.cc
-    0002.file_io_tsc/time/c_file_unlocked.cc
-    0002.file_io_tsc/time/c_file_unlocked_text.cc
+    # 0002.file_io_tsc/time/c_file.cc # error: ‘vector’ is not a member of ‘std’
+    # 0002.file_io_tsc/time/c_file_unlocked.cc # error: ‘vector’ is not a member of ‘std’
+    # 0002.file_io_tsc/time/c_file_unlocked_text.cc # error: ‘vector’ is not a member of ‘std’
     # 0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file.cc
     # 0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file_l10n.cc
-    0002.file_io_tsc/time/filebuf_file.cc
-    0002.file_io_tsc/time/fstream.cc
+    # 0002.file_io_tsc/time/filebuf_file.cc # error: ‘vector’ is not a member of ‘std’
+    # 0002.file_io_tsc/time/fstream.cc # error: ‘vector’ is not a member of ‘std’
     0002.file_io_tsc/time/fstream_std_format.cc
-    0002.file_io_tsc/time/fstreamtext.cc
+    # 0002.file_io_tsc/time/fstreamtext.cc # error: ‘vector’ is not a member of ‘std’
     0002.file_io_tsc/time/iobuf_file.cc
     0002.file_io_tsc/time/iobuf_file_be32.cc
     # 0002.file_io_tsc/time/iobuf_file_bin.cc
@@ -61,19 +65,19 @@ set(benchmarks_simple
     # 0002.file_io_tsc/time/iobuf_file_l10n.cc
     0002.file_io_tsc/time/iobuf_file_le32.cc
     0002.file_io_tsc/time/iobuf_file_leb128.cc
-    0002.file_io_tsc/time/iobuf_file_lockable.cc
-    0002.file_io_tsc/time/iobuf_file_lockable_big.cc
+    # 0002.file_io_tsc/time/iobuf_file_lockable.cc # error: ‘using fast_io::io_lock_guard<fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::in>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::in, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, char, void, 131072, 0> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > > >::mutex_type = struct fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::in>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::in, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, char, void, 131072, 0> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > >’ {aka ‘struct fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::in>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::in, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, char, void, 131072, 0> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > >’} has no member named ‘lock’ : device.lock();
+    # 0002.file_io_tsc/time/iobuf_file_lockable_big.cc # error: ‘using fast_io::io_lock_guard<fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::out>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::out, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, void, char, 0, 131072> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > > >::mutex_type = struct fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::out>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::out, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, void, char, 0, 131072> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > >’ {aka ‘struct fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::out>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::out, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, void, char, 0, 131072> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > >’} has no member named ‘lock’
     0002.file_io_tsc/time/iobuf_file_lockable_leb128.cc
     0002.file_io_tsc/time/iobuf_file_std_format.cc
     0002.file_io_tsc/time/iobuf_file_std_format_locale.cc
-    0002.file_io_tsc/time/iobuf_io_file.cc
-    0002.file_io_tsc/time/iobuf_io_file_eol.cc
-    0002.file_io_tsc/time/iobuf_io_file_eol_dbg.cc
-    0002.file_io_tsc/time/iobuf_io_file_lf_cr.cc
-    0002.file_io_tsc/time/iobuf_io_file_lf_crlf.cc
+    # 0002.file_io_tsc/time/iobuf_io_file.cc # error: ‘vector’ is not a member of ‘std’
+    # 0002.file_io_tsc/time/iobuf_io_file_eol.cc # error: ‘vector’ is not a member of ‘std’
+    # 0002.file_io_tsc/time/iobuf_io_file_eol_dbg.cc # error: ‘vector’ is not a member of ‘std’
+    # 0002.file_io_tsc/time/iobuf_io_file_lf_cr.cc # error: ‘vector’ is not a member of ‘std’
+    # 0002.file_io_tsc/time/iobuf_io_file_lf_crlf.cc # error: ‘vector’ is not a member of ‘std’
     # 0002.file_io_tsc/time/llvm_raw_fd_ostream.cc
     0002.file_io_tsc/time/stdio.cc
-    0002.file_io_tsc/time/stdiotext.cc
+    # 0002.file_io_tsc/time/stdiotext.cc #  error: ‘vector’ is not a member of ‘std’
     0002.file_io_tsc/time/u32iobuf_file.cc
     0002.file_io_tsc/time/wiobuf_file.cc
     0003.file_io_hex/fstream.cc
@@ -145,7 +149,7 @@ set(benchmarks_simple
     0011.containers/vector/0002.multi_push_back/fast_io.cc
     0011.containers/vector/0002.multi_push_back/std.cc
     # 0011.containers/vector/0002.multi_push_back/std_mimalloc.cc
-    0012.isa/sha512.cc
+    # 0012.isa/sha512.cc # it doesn't have main
     0013.bitset/filebuf_file.cc
     0013.bitset/ostream.cc
     0013.bitset/u8c_file.cc
@@ -223,9 +227,24 @@ set(benchmarks_llvm_only
 set(benchmarks_experimental
     0002.file_io_tsc/longspaces/iobuf_file.cc #  error: ‘char_type’ in ‘using fast_io::obuf_file = fast_io::basic_obuf_file<char>’  does not name a type
     0002.file_io_tsc/longspaces/iobuf_file_verify.cc # error: ‘char_type’ in ‘using fast_io::obuf_file = fast_io::basic_obuf_file<char>’ does not name a type
+    0002.file_io_tsc/longspaces/u32iobuf_file.cc # error: ‘char_type’ in ‘using fast_io::u32obuf_file = fast_io::basic_obuf_file<char32_t>’ {aka ‘class fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char32_t>, fast_io::open_mode::out>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::out, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, void, char32_t, 0, 32768> >’} does not name a type
     0002.file_io_tsc/longspaces/u32utf8_file.cc # error: ‘u32outf8_file’ is not a member of ‘fast_io’; did you mean ‘u32obuf_file’?
+    0002.file_io_tsc/time/c_file.cc # error: ‘vector’ is not a member of ‘std’
+    0002.file_io_tsc/time/c_file_unlocked.cc # error: ‘vector’ is not a member of ‘std’
+    0002.file_io_tsc/time/c_file_unlocked_text.cc # error: ‘vector’ is not a member of ‘std’
+    0002.file_io_tsc/time/filebuf_file.cc # error: ‘vector’ is not a member of ‘std’
+    0002.file_io_tsc/time/fstream.cc # error: ‘vector’ is not a member of ‘std’
+    0002.file_io_tsc/time/fstreamtext.cc # error: ‘vector’ is not a member of ‘std’
     0002.file_io_tsc/time/iobuf_file_bin.cc # error: cannot convert ‘fast_io::obuf_file’ to int
     0002.file_io_tsc/time/iobuf_file_l10n.cc # error: ‘buffer_output_stream’ has not been declared
+    0002.file_io_tsc/time/iobuf_io_file.cc # error: ‘vector’ is not a member of ‘std’
+    0002.file_io_tsc/time/iobuf_io_file_eol.cc # error: ‘vector’ is not a member of ‘std’
+    0002.file_io_tsc/time/iobuf_io_file_eol_dbg.cc # error: ‘vector’ is not a member of ‘std’
+    0002.file_io_tsc/time/iobuf_io_file_lf_cr.cc # error: ‘vector’ is not a member of ‘std’
+    0002.file_io_tsc/time/iobuf_io_file_lf_crlf.cc # error: ‘vector’ is not a member of ‘std’
+    0002.file_io_tsc/time/iobuf_file_lockable.cc # error: ‘using fast_io::io_lock_guard<fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::in>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::in, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, char, void, 131072, 0> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > > >::mutex_type = struct fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::in>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::in, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, char, void, 131072, 0> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > >’ {aka ‘struct fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::in>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::in, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, char, void, 131072, 0> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > >’} has no member named ‘lock’ : device.lock();
+    0002.file_io_tsc/time/iobuf_file_lockable_big.cc # error: ‘using fast_io::io_lock_guard<fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::out>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::out, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, void, char, 0, 131072> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > > >::mutex_type = struct fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::out>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::out, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, void, char, 0, 131072> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > >’ {aka ‘struct fast_io::basic_general_io_lockable_nonmovable<fast_io::basic_io_buffer<fast_io::basic_file_wrapper<fast_io::basic_posix_family_file<fast_io::posix_family::api, char>, fast_io::open_mode::out>, fast_io::basic_io_buffer_traits<fast_io::buffer_mode::out, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>, void, char, 0, 131072> >, fast_io::basic_general_mutex_movable<fast_io::posix_pthread_mutex, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> > >’} has no member named ‘lock’
+    0002.file_io_tsc/time/stdiotext.cc #  error: ‘vector’ is not a member of ‘std’
     0003.file_io_hex/iobuf_file_addrvw.cc #  error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
     0003.file_io_hex/iobuf_file_l10n.cc # error: ‘buffer_output_stream’ has not been declared
     0004.file_io_floating/charconv_general.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
@@ -257,6 +276,10 @@ set(benchmarks_experimental_linux_only
 set(benchmarks_experimental_dragonbox
     0008/seperate/dragonbox_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’
     0008/seperate_short/dragonbox_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’
+)
+
+set(benchmarks_which_does_not_have_main_wtf
+  0012.isa/sha512.cc
 )
 
 # cmake-format: on
@@ -320,7 +343,9 @@ if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC})
   apply_to_sources_benchmark(benchmarks_mimalloc_only link_mimalloc)
   message(STATUS "Benchmarks with mimalloc are going to be build.")
 else()
-  message(STATUS "Benchmarks with mimalloc are NOT going to be build, because ${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC is set to ${${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC}."
+  message(
+    STATUS
+      "Benchmarks with mimalloc are NOT going to be build, because ${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC is set to ${${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC}."
   )
 endif()
 
@@ -360,6 +385,10 @@ else()
   ${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL}"
   )
 endif()
+
+apply_to_sources_benchmark(
+  benchmarks_which_does_not_have_main_wtf create_library_default_benchmarks
+)
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
 

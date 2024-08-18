@@ -41,7 +41,7 @@ set(tests_simple
     0001.input/invalid_number.cc
     0002.printscan/print.cc
     0002.printscan/scan.cc
-    0003.concat/constexpr.cc
+    # 0003.concat/constexpr.cc # error: static assertion failed  static_assert(foo());
     # 0003.concat/integer.cc # In instantiation of ‘constexpr std::string fast_io::concat(Args&& ...) [with Args = {_IO_FILE*&}; std::string = std::__cxx11::basic_string<char>]’ error: static assertion failed: some types are not printable, so we cannot concat ::std::string
     0004.floating/complex_double.cc
     0004.floating/double.cc
@@ -144,7 +144,7 @@ set(tests_simple
     0026.container/0008.priority_queue/test_priority_queue.cc
     0026.container/0009.string_view/string_view.cc
     0026.container/0010.cstring_view/cstring_view.cc
-    0026.container/0011.span/index_span.cc
+    # 0026.container/0011.span/index_span.cc #  error: ‘const class fast_io::containers::index_span<T, N>’ has no member named ‘n’
     0026.container/0011.span/span.cc
     0026.container/trivialclass.cc
     # 0027.rwreflect/read_some.cc # fatal error: fast_io_core_impl/rwreflect/impl.h: No such file or directory
@@ -199,6 +199,7 @@ set(tests_doesnt_have_main
 )
 
 set(tests_experimental
+    0003.concat/constexpr.cc # error: static assertion failed static_assert(foo());
     0003.concat/integer.cc # In instantiation of ‘constexpr std::string fast_io::concat(Args&& ...) [with Args = {_IO_FILE*&}; std::string = std::__cxx11::basic_string<char>]’ error: static assertion failed: some types are not printable, so we cannot concat ::std::string
     0004.floating/lc_double.cc # error: ‘buffer_output_stream’ has not been declared
     0004.floating/rounding.cc # error: ‘println’ was not declared in this scope; did you mean ‘fast_io::io::println’?
@@ -234,6 +235,7 @@ set(tests_experimental
     0026.container/0001.vector/shrink_to_fit.cc # error: ‘fast_io::vector<int>’ {aka ‘class fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >’} has no member named ‘resize’;
     0026.container/0001.vector/swap.cc # error: ‘fast_io::vector<int>’ {aka ‘class fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >’} has no member named ‘swap’
     0026.container/0001.vector/vector.cc # error: no matching function for call to ‘fast_io::containers::vector<std::__cxx11::basic_string<char>, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >::vector(fast_io::containers::vector<std::__cxx11::basic_string<char>, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >::iterator, fast_io::containers::vector<std::__cxx11::basic_string<char>, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >::iterator)’
+    0026.container/0011.span/index_span.cc #  error: ‘const class fast_io::containers::index_span<T, N>’ has no member named ‘n’
     0027.rwreflect/read_some.cc # fatal error: fast_io_core_impl/rwreflect/impl.h: No such file or directory
     0027.rwreflect/tall/family.cc # undefined reference to `fakewrite'
     0027.rwreflect/tall/fmily.cc # error: ‘println_freestanding’ is not a member of ‘fast_io::operations’; did you mean ‘print_freestanding’?
