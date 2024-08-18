@@ -140,3 +140,51 @@ else()
   libFuzzer, which is clang-only feature at the moment of writing this."
   )
 endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  file(
+    GLOB_RECURSE files
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
+  )
+
+  foreach(file ${files})
+    message(DEBUG "fuzzings files: ${file}")
+  endforeach()
+
+
+  set(all_fuzzings "")
+
+  list(APPEND all_fuzzings ${fuzzing_libfuzzer})
+  list(APPEND all_fuzzings ${fuzzing_just_main})
+  list(APPEND all_fuzzings ${fuzzing_libfuzzer_experimental})
+  list(APPEND all_fuzzings ${fuzzing_just_main_experimental})
+
+  foreach(fuzzing ${all_fuzzings})
+    message(DEBUG "all_fuzzings: ${fuzzing}")
+  endforeach()
+
+  foreach(file ${all_fuzzings})
+    list(REMOVE_ITEM files ${file})
+  endforeach()
+
+  foreach(lefted_file ${files})
+    message(AUTHOR_WARNING "No fuzzing for next file: fuzzing/${lefted_file}")
+  endforeach()
+
+  file(
+    GLOB_RECURSE files
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
+  )
+
+  foreach(file ${files})
+    list(REMOVE_ITEM all_fuzzings ${file})
+  endforeach()
+
+  foreach(lefted_file ${all_fuzzings})
+    message(
+      AUTHOR_WARNING "Excessive CMake for next previously existed fuzzing-file: fuzzing/${lefted_file}"
+    )
+  endforeach()
+endif()

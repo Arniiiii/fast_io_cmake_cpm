@@ -20,15 +20,6 @@ endfunction()
 
 # cmake-format: off
 
-# file(
-#   GLOB_RECURSE files
-#   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-#   ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
-# )
-# foreach(file ${files})
-#   message(DEBUG "Benchmarks *.cc: ${file}")
-# endforeach()
-
 set(benchmarks_simple
     # 0001.refterm/filebuf_file.cc
     # 0001.refterm/fpipe.cc
@@ -46,7 +37,7 @@ set(benchmarks_simple
     # 0002.file_io_tsc/longspaces/iobuf_file.cc
     # 0002.file_io_tsc/longspaces/iobuf_file_verify.cc
     0002.file_io_tsc/longspaces/stdio.cc
-    # 0002.file_io_tsc/longspaces/u32iobuf_file.cc
+    0002.file_io_tsc/longspaces/u32iobuf_file.cc
     # 0002.file_io_tsc/longspaces/u32utf8_file.cc
     0002.file_io_tsc/random/c_file.cc
     0002.file_io_tsc/random/filebuf_file.cc
@@ -70,12 +61,11 @@ set(benchmarks_simple
     # 0002.file_io_tsc/time/iobuf_file_l10n.cc
     0002.file_io_tsc/time/iobuf_file_le32.cc
     0002.file_io_tsc/time/iobuf_file_leb128.cc
-    0002.file_io_tsc/time/iobuf_file_mutex.cc
-    # 0002.file_io_tsc/time/iobuf_file_mutex_big.cc
+    0002.file_io_tsc/time/iobuf_file_lockable.cc
+    0002.file_io_tsc/time/iobuf_file_lockable_big.cc
+    0002.file_io_tsc/time/iobuf_file_lockable_leb128.cc
     0002.file_io_tsc/time/iobuf_file_std_format.cc
     0002.file_io_tsc/time/iobuf_file_std_format_locale.cc
-    # 0002.file_io_tsc/time/iobuf_file_unsafe_rt_fprint.cc
-    # 0002.file_io_tsc/time/iobuf_file_unsafe_rt_fprint_l10n.cc
     0002.file_io_tsc/time/iobuf_io_file.cc
     0002.file_io_tsc/time/iobuf_io_file_eol.cc
     0002.file_io_tsc/time/iobuf_io_file_eol_dbg.cc
@@ -115,7 +105,7 @@ set(benchmarks_simple
     # 0007.concat/concat_qstring.cc
     # 0007.concat/concat_std.cc
     # 0007.concat/concat_string.cc
-    # 0007.concat/concat_vs_format.cc
+    0007.concat/concat_vs_format.cc # requires or std::format or fmtlib.
     # 0007.concat/to_hstring.cc
     0008/seperate/charconv.cc
     # 0008/seperate/charconv_no_c_str.cc
@@ -155,7 +145,7 @@ set(benchmarks_simple
     0011.containers/vector/0002.multi_push_back/fast_io.cc
     0011.containers/vector/0002.multi_push_back/std.cc
     # 0011.containers/vector/0002.multi_push_back/std_mimalloc.cc
-    # 0012.isa/sha512.cc
+    0012.isa/sha512.cc
     0013.bitset/filebuf_file.cc
     0013.bitset/ostream.cc
     0013.bitset/u8c_file.cc
@@ -191,6 +181,7 @@ set(benchmarks_windows_only
     0001.refterm/fpipe.cc
     0001.refterm/fstream.cc
     0007.concat/concat_cstring.cc
+    0007.concat/concat_hstring.cc
     0007.concat/to_hstring.cc
     0010.line/scan_winrt_hstring.cc
     0015.string/scan_winrt_hstring.cc
@@ -199,7 +190,7 @@ set(benchmarks_windows_only
 )
 
 set(benchmarks_linux_only
-    # 0005.time/glibc_nl_langinfo.cc # error: cannot convert ‘fast_io::obuf_file’ to int
+    # 0005.time/glibc_nl_langinfo.cc # actually, it's not linux only, but glibc only  # error: cannot convert ‘fast_io::obuf_file’ to int
     0005.time/put_time.cc
     0017.syscalls/posix_file.cc
 )
@@ -235,9 +226,6 @@ set(benchmarks_experimental
     0002.file_io_tsc/longspaces/u32utf8_file.cc # error: ‘u32outf8_file’ is not a member of ‘fast_io’; did you mean ‘u32obuf_file’?
     0002.file_io_tsc/time/iobuf_file_bin.cc # error: cannot convert ‘fast_io::obuf_file’ to int
     0002.file_io_tsc/time/iobuf_file_l10n.cc # error: ‘buffer_output_stream’ has not been declared
-    0002.file_io_tsc/time/iobuf_file_mutex_big.cc # error: ‘using fast_io::io_lock_guard<...>  has no member named ‘lock’
-    0002.file_io_tsc/time/iobuf_file_unsafe_rt_fprint.cc # maybe WinRT only? # error: ‘unsafe_rt_format_string_view’ in namespace ‘fast_io’ does not name a type
-    0002.file_io_tsc/time/iobuf_file_unsafe_rt_fprint_l10n.cc # maybe WinRT only? # error: ‘buffer_output_stream’ has not been declared
     0003.file_io_hex/iobuf_file_addrvw.cc #  error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
     0003.file_io_hex/iobuf_file_l10n.cc # error: ‘buffer_output_stream’ has not been declared
     0004.file_io_floating/charconv_general.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
@@ -260,6 +248,15 @@ set(benchmarks_experimental
     0014.codecvt/u16utf8_file.cc # error: ‘u16outf8_file’ is not a member of ‘fast_io’
     0014.codecvt/u32utf8_file.cc # error: ‘u32outf8_file’ is not a member of ‘fast_io
     0015.string/scan_u16string_u16utf8.cc # error: ‘u16iutf8_file’ is not a member of ‘fast_io’
+)
+
+set(benchmarks_experimental_linux_only
+    0005.time/glibc_nl_langinfo.cc # error: cannot convert ‘fast_io::obuf_file’ to int
+)
+
+set(benchmarks_experimental_dragonbox
+    0008/seperate/dragonbox_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’
+    0008/seperate_short/dragonbox_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’
 )
 
 # cmake-format: on
@@ -308,9 +305,9 @@ if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX})
   apply_to_sources_benchmark(benchmarks_dragonbox_only link_dragonbox)
   message(STATUS "Benchmarks with dragonbox are going to be build.")
 else()
-  message(STATUS "Benchmarks with dragonbox are NOT going to be build, because
-  ${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX is set to
-  ${${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX}."
+  message(
+    STATUS
+      "Benchmarks with dragonbox are NOT going to be build, because ${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX is set to ${${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX}."
   )
 endif()
 
@@ -323,9 +320,7 @@ if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC})
   apply_to_sources_benchmark(benchmarks_mimalloc_only link_mimalloc)
   message(STATUS "Benchmarks with mimalloc are going to be build.")
 else()
-  message(STATUS "Benchmarks with mimalloc are NOT going to be build, because
-  ${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC is set to
-  ${${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC}."
+  message(STATUS "Benchmarks with mimalloc are NOT going to be build, because ${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC is set to ${${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC}."
   )
 endif()
 
@@ -342,9 +337,83 @@ endif()
 if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL})
   apply_to_sources_benchmark(benchmarks_experimental create_exe_default_benchmarks)
   message(STATUS "Benchmarks that are experimental are going to be build.")
+  if(CMAKE_SYSTEM_NAME STREQUAL Linux)
+    apply_to_sources_benchmark(benchmarks_experimental_linux_only create_exe_default_benchmarks)
+    message(STATUS "Benchmarks that are experimental and for Linux only are going to be build.")
+  else()
+    message(STATUS "Benchmarks that are experimental and for Linux only are
+    NOT going to be build, because system seems to be not Linux"
+    )
+  endif()
+  if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX})
+    apply_to_sources_benchmark(benchmarks_experimental_dragonbox create_exe_default_benchmarks)
+    message(STATUS "Benchmarks that are experimental and with Dragonbox are going to be build.")
+  else()
+    message(
+      STATUS
+        "Benchmarks that are experimental and with dragonbox are NOT going to be build, because ${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX is set to ${${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX}."
+    )
+  endif()
 else()
   message(STATUS "Benchmarks that are experimental are NOT going to be build,
   becuase ${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL is set to
   ${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL}"
   )
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+
+  file(
+    GLOB_RECURSE files
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
+  )
+
+  set(files2 "${files}")
+
+  foreach(file ${files})
+    message(DEBUG "benchmarks files: ${file}")
+  endforeach()
+
+  set(all_benchmarks "")
+
+  list(APPEND all_benchmarks ${benchmarks_simple})
+  list(APPEND all_benchmarks ${benchmarks_windows_only})
+  list(APPEND all_benchmarks ${benchmarks_linux_only})
+  list(APPEND all_benchmarks ${benchmarks_qt_only})
+  list(APPEND all_benchmarks ${benchmarks_dragonbox_only})
+  list(APPEND all_benchmarks ${benchmarks_mimalloc_only})
+  list(APPEND all_benchmarks ${benchmarks_llvm_only})
+  list(APPEND all_benchmarks ${benchmarks_experimental})
+  list(APPEND all_benchmarks ${benchmarks_experimental_linux_only})
+  list(APPEND all_benchmarks ${benchmarks_experimental_dragonbox})
+
+  foreach(benchmark ${all_benchmarks})
+    message(DEBUG "all_benchmarks: ${benchmark}")
+  endforeach()
+
+  foreach(file ${all_benchmarks})
+    list(REMOVE_ITEM files ${file})
+  endforeach()
+
+  foreach(lefted_file ${files})
+    message(AUTHOR_WARNING "No benchmark for next file: benchmark/${lefted_file}")
+  endforeach()
+
+  file(
+    GLOB_RECURSE files
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
+  )
+
+  foreach(file ${files2})
+    list(REMOVE_ITEM all_benchmarks ${file})
+  endforeach()
+
+  foreach(lefted_file ${all_benchmarks})
+    message(
+      AUTHOR_WARNING
+        "Excessive CMake for next previously existed benchmark-file: benchmark/${lefted_file}"
+    )
+  endforeach()
 endif()

@@ -163,6 +163,7 @@ set(tests_simple
     # 0031.tpeb/stdout.cc # windows only?
     0032.process/nt.cc
     0033.legacy/getfd.cc
+    0034.string/stringtest.cc
 )
 
 
@@ -246,11 +247,12 @@ set(tests_experimental
 apply_to_sources_tests(tests_simple create_exe_default_test)
 
 if(${${PROJECT_NAME}_TEST_TRY_BOOST_UUID})
-  set(TRY_BOOST_VERSION "1.85.0")
+  include(../cmake/packages/boost/add_addboost.cmake)
+  set(TRY_BOOST_VERSION "1.86.0")
   # set(BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED "thread")
   set(BOOST_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED "uuid")
-  add_boost(${TRY_BOOST_VERSION} ${BOOST_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED}
-            ${BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED} ${tests_boost_uuid}
+  add_boost(TRY_BOOST_VERSION BOOST_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED
+            BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED ${tests_boost_uuid}
   )
 endif()
 
@@ -273,4 +275,54 @@ endforeach()
 
 if(${${PROJECT_NAME}_ENABLE_TESTS_EXPERIMENTAL})
   apply_to_sources_tests(tests_experimental create_exe_default_test)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  file(
+    GLOB_RECURSE files
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+  )
+  
+  set(files2 "${files}")
+
+  foreach(file ${files})
+    message(DEBUG "tests files: ${file}")
+  endforeach()
+
+  set(all_tests "")
+
+  list(APPEND all_tests ${tests_simple})
+  list(APPEND all_tests ${tests_boost_uuid})
+  list(APPEND all_tests ${tests_windows_only})
+  list(APPEND all_tests ${tests_linux_only})
+  # list(APPEND all_tests ${tests_multiple_compilation_units})
+  foreach(set_of_compilation_units ${tests_multiple_compilation_units})
+    list(APPEND all_tests ${${set_of_compilation_units}})
+  endforeach()
+  list(APPEND all_tests ${tests_doesnt_have_main})
+  list(APPEND all_tests ${tests_experimental})
+
+  foreach(test ${all_tests})
+    message(DEBUG "all_tests: ${test}")
+  endforeach()
+
+  foreach(file ${all_tests})
+    list(REMOVE_ITEM files ${file})
+  endforeach()
+
+  foreach(lefted_file ${files})
+    message(AUTHOR_WARNING "No test for next file: tests/${lefted_file}")
+  endforeach()
+
+  foreach(file ${files2})
+    list(REMOVE_ITEM all_tests ${file})
+  endforeach()
+
+  foreach(lefted_file ${all_tests})
+    message(AUTHOR_WARNING "Excessive CMake for next previously existed test-file:
+      tests/${lefted_file}"
+    )
+  endforeach()
 endif()

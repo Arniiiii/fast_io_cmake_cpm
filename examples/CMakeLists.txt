@@ -18,17 +18,6 @@ endfunction()
 
 # cmake-format: off
 
-# file(
-#   GLOB_RECURSE files
-#   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-#   ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
-# )
-# foreach(file ${files})
-#   message(DEBUG "examples *.cc: ${file}")
-# endforeach()
-
-
-
 set(examples_simple
     0000.compile/compile.cc
     0000.compile/compile_freestanding.cc
@@ -39,7 +28,7 @@ set(examples_simple
     # 0001.helloworld/helloworld_android_remote_dbg.cc
     0001.helloworld/helloworld_dbg.cc
     0001.helloworld/helloworld_out.cc
-    0001.helloworld/helloworld_out_buf_mutex.cc
+    0001.helloworld/helloworld_out_buf_lockable.cc
     0002.a+b/a+b.cc
     0002.a+b/base36_a+b.cc
     0002.a+b/hex_a+b.cc
@@ -179,7 +168,7 @@ set(examples_simple
 )
 
 
-set(examples_complicated
+set(examples_complex
   # 0020.operating_system; # There's no cmake # TODO
   0021.kernel_driver;
 )
@@ -274,6 +263,7 @@ set(examples_experimental
     0009.filesystem/update_wow_toc.cc # error: cannot convert ‘fast_io::obuf_file’ to int
     0012.transmit/transmit.cc # error: ‘transmit’ was not declared in this scope
     0017.network/http.cc # error: call of overloaded ‘find_not(const char8_t*&, const char8_t*&, const char8_t&)’ is ambiguous
+    0017.network/tcp_client.cc #  error: ‘transmit’ was not declared in this scope
     0027.filelock/buffer_lock.cc # error: ‘file_lock’ was not declared in this scope
     0027.filelock/buffered_file_with_file_lock.cc # error: ‘file_lock’ was not declared in this scope
     0027.filelock/filelock.cc # error: ‘file_lock’ was not declared in this scope
@@ -395,7 +385,8 @@ if(${LUA_FOUND})
   message(STATUS "Examples with Lua are going to be build.")
 else()
   message(STATUS "Examples with Lua are NOT going to be build, because Lua is
-  not found by CMake as a local package.")
+  not found by CMake as a local package."
+  )
 endif()
 
 function(link_python name source)
@@ -411,16 +402,19 @@ if(${Python_Development_FOUND})
   message(STATUS "Examples with Python are going to be build.")
 else()
   message(STATUS "Examples with Python are NOT going to be build, because
-  Python C-API related parts are not found by CMake.")
+  Python C-API related parts are not found by CMake."
+  )
 endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
   apply_to_sources_examples(examples_wasm_only create_exe_default_example)
   message(STATUS "Examples with Emscripten, which are WASM only, are going to
-  be build.")
+  be build."
+  )
 else()
   message(STATUS "Examples with Emscripten, which are WASM only, are NOT going to
-  be build, because you are not using Emscripten's CMake toolchain.")
+  be build, because you are not using Emscripten's CMake toolchain."
+  )
 endif()
 
 function(link_pulseaudio name source)
@@ -436,10 +430,11 @@ if(${PulseAudio_FOUND})
 else()
   message(STATUS "Examples with PulseAudio's libpulse are not going to be build, because
   CMake couldn't find its pkgconfig *.pc file. If you are not on Linux,
-  nevermind.")
+  nevermind."
+  )
 endif()
 
-foreach(subdir ${examples_complicated})
+foreach(subdir ${examples_complex})
   add_subdirectory(${subdir})
 endforeach()
 
@@ -447,6 +442,77 @@ if(${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL})
   apply_to_sources_examples(examples_experimental create_exe_default_example)
   message(STATUS "Examples that are experimental are going to be build.")
 else()
-  message(STATUS "Examples that are experimental are NOT going to be build,
-  because ${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL is set to ${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL}.")
+  message(
+    STATUS
+      "Examples that are experimental are NOT going to be build,
+  because ${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL is set to ${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL}."
+  )
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+
+  file(
+    GLOB_RECURSE files
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
+  )
+
+  foreach(complex ${examples_complex} ${examples_todo_cmake} ${examples_limine})
+    file(
+      GLOB_RECURSE files_blacklist
+      RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+      ${CMAKE_CURRENT_SOURCE_DIR}/${complex}/*.cc
+    )
+    message(DEBUG "Examples files blacklist ${complex}: ${files_blacklist}")
+    list(REMOVE_ITEM files ${files_blacklist})
+  endforeach()
+  
+  set(files2 "${files}")
+
+  foreach(file ${files})
+    message(DEBUG "examples files: ${file}")
+  endforeach()
+
+  set(all_examples "")
+
+  list(APPEND all_examples ${examples_simple})
+  # list(APPEND all_examples ${examples_complex})
+  list(APPEND all_examples ${examples_android_only})
+  list(APPEND all_examples ${examples_cryptopp})
+  list(APPEND all_examples ${examples_openssl})
+  list(APPEND all_examples ${examples_qt})
+  list(APPEND all_examples ${examples_i18n})
+  list(APPEND all_examples ${examples_llvm_only})
+  # list(APPEND all_examples ${examples_limine})
+  list(APPEND all_examples ${examples_windows})
+  list(APPEND all_examples ${examples_winrt})
+  list(APPEND all_examples ${examples_lua})
+  list(APPEND all_examples ${examples_python})
+  list(APPEND all_examples ${examples_wasm_only})
+  list(APPEND all_examples ${examples_pulseaudio})
+  # list(APPEND all_examples ${examples_todo_cmake})
+  list(APPEND all_examples ${examples_experimental})
+
+  foreach(example ${all_examples})
+    message(DEBUG "all_examples: ${example}")
+  endforeach()
+  
+  foreach(file ${all_examples})
+    list(REMOVE_ITEM files ${file})
+  endforeach()
+
+  foreach(lefted_file ${files})
+    message(AUTHOR_WARNING "No example for next file: examples/${lefted_file}")
+  endforeach()
+
+  foreach(file ${files2})
+    list(REMOVE_ITEM all_examples ${file})
+  endforeach()
+
+  foreach(lefted_file ${all_examples})
+    message(
+      AUTHOR_WARNING
+        "Excessive CMake for next previously existed example-file: examples/${lefted_file}"
+    )
+  endforeach()
 endif()
