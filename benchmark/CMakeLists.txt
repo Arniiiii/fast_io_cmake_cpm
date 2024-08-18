@@ -15,10 +15,12 @@ function(create_library_default_benchmarks name source)
 endfunction()
 
 function(link_qt_core name source)
-  if(${QT5_FOUND})
+  if(${Qt6Core_FOUND})
+    target_link_libraries(${name} PRIVATE Qt6::Core)
+  elseif(${Qt5Core_FOUND})
     target_link_libraries(${name} PRIVATE Qt5::Core)
   else()
-    target_link_libraries(${name} PRIVATE Qt6::Core)
+    message(FATAL_ERROR "WTF with found Qt ?!")
   endif()
 endfunction()
 
@@ -309,13 +311,18 @@ endif()
 
 find_package(Qt5 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Core)
-if(${QT5_FOUND} OR ${QT6_FOUND})
+
+if(${Qt6Core_FOUND})
   apply_to_sources_benchmark(benchmarks_qt_only create_exe_default_benchmarks)
   apply_to_sources_benchmark(benchmarks_qt_only link_qt_core)
-  message(STATUS "Benchmarks with Qt are going to be build.")
+  message(STATUS "Benchmarks with Qt are going to be build with Qt6.")
+elseif(${Qt5Core_FOUND})
+  apply_to_sources_benchmark(benchmarks_qt_only create_exe_default_benchmarks)
+  apply_to_sources_benchmark(benchmarks_qt_only link_qt_core)
+  message(STATUS "Benchmarks with Qt are going to be build with Qt5.")
 else()
   message(STATUS "Benchmarks with Qt are NOT going to be build, because CMake
-  could not find a local Qt5 or Qt6."
+  could not find a local Qt6 or Qt5."
   )
 endif()
 
@@ -416,6 +423,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   list(APPEND all_benchmarks ${benchmarks_experimental})
   list(APPEND all_benchmarks ${benchmarks_experimental_linux_only})
   list(APPEND all_benchmarks ${benchmarks_experimental_dragonbox})
+  list(APPEND all_benchmarks ${benchmarks_which_does_not_have_main_wtf})
 
   foreach(benchmark ${all_benchmarks})
     message(DEBUG "all_benchmarks: ${benchmark}")

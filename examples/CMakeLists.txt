@@ -335,23 +335,27 @@ else()
 endif()
 
 function(link_qt_core name source)
-  if(${QT5_FOUND})
+  if(${Qt5Core_FOUND})
     target_link_libraries(${name} PRIVATE Qt5::Core)
-  else()
+  else(${Qt6Core_FOUND})
     target_link_libraries(${name} PRIVATE Qt6::Core)
   endif()
 endfunction()
 
-find_package(Qt5 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Core)
-if(${QT5_FOUND} OR ${QT6_FOUND})
+find_package(Qt5 COMPONENTS Core)
+if(${Qt6Core_FOUND})
   apply_to_sources_examples(examples_qt create_exe_default_example)
   apply_to_sources_examples(examples_qt link_qt_core)
-  message(STATUS "Examples with Qt are going to be build.")
+  message(STATUS "Examples with Qt are going to be build with Qt6.")
+elseif(${Qt5Core_FOUND})
+  apply_to_sources_examples(examples_qt create_exe_default_example)
+  apply_to_sources_examples(examples_qt link_qt_core)
+  message(STATUS "Examples with Qt are going to be build with Qt5.")
 else()
   message(
     STATUS
-      "Examples with Qt are not going to be build, because local neither Qt5 nor Qt6 are found."
+      "Examples with Qt are not going to be build, because local neither Qt6 nor Qt5 are found."
   )
 endif()
 
