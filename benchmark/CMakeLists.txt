@@ -221,9 +221,9 @@ set(benchmarks_mimalloc_only
 )
 
 set(benchmarks_llvm_only
-    0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file.cc
-    0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file_l10n.cc
-    0002.file_io_tsc/time/llvm_raw_fd_ostream.cc
+    # 0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file.cc # static_assert(type_error, "some types are not printable for print on default C's stdout");
+    # 0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file_l10n.cc # error: ‘buffer_output_stream’ has not been declared
+    # 0002.file_io_tsc/time/llvm_raw_fd_ostream.cc # static_assert(type_error, "some types are not printable for print on default C's stdout")
 )
 
 set(benchmarks_experimental
@@ -287,8 +287,14 @@ set(benchmarks_experimental_qt_only
     0015.string/scan_qstring_u16utf8.cc # error: ‘u16iutf8_file’ is not a member of ‘fast_io’
 )
 
+set(benchmarks_experimental_llvm_only     
+    0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file.cc # static_assert(type_error, "some types are not printable for print on default C's stdout");
+    0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file_l10n.cc # error: ‘buffer_output_stream’ has not been declared
+    0002.file_io_tsc/time/llvm_raw_fd_ostream.cc # static_assert(type_error, "some types are not printable for print on default C's stdout")
+)
+
 set(benchmarks_which_does_not_have_main_wtf
-  0012.isa/sha512.cc
+    0012.isa/sha512.cc
 )
 
 # cmake-format: on
@@ -374,6 +380,7 @@ if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX})
   message(STATUS "Benchmarks with dragonbox are going to be build.")
   if(${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL})
     apply_to_sources_benchmark(benchmarks_experimental_dragonbox create_exe_default_benchmarks)
+    apply_to_sources_benchmark(benchmarks_experimental_dragonbox link_dragonbox)
     message(STATUS "Benchmarks that are experimental and with Dragonbox are going to be build.")
   else()
     message(STATUS "Benchmarks that are experimental and with dragonbox are NOT going to be build,
@@ -403,13 +410,30 @@ else()
   )
 endif()
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  # using regular Clang or AppleClang
+include(../cmake/packages/llvm/find_llvm.cmake)
+message(STATUS "LLVM_INCLUDE_DIRS: ${LLVM_INCLUDE_DIRS}")
+message(STATUS "LLVM_FOUND: ${LLVM_FOUND}")
+message(STATUS "LLVM_VERSION: ${LLVM_VERSION}")
+if(${LLVM_FOUND})
   apply_to_sources_benchmark(benchmarks_llvm_only create_exe_default_benchmarks)
-  message(STATUS "Benchmarks that are clang-only are going to be build.")
+  function(link_llvm name source)
+    target_include_directories(${name} PRIVATE ${LLVM_INCLUDE_DIRS})
+  endfunction()
+  apply_to_sources_benchmark(benchmarks_llvm_only link_llvm)
+  message(STATUS "Benchmarks that requires LLVM libraries are going to be build.")
+  if(${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL})
+    apply_to_sources_benchmark(benchmarks_experimental_llvm_only create_exe_default_benchmarks)
+    apply_to_sources_benchmark(benchmarks_experimental_llvm_only link_llvm)
+    message(STATUS "Benchmarks that are experimental and with LLVM are going to be build.")
+  else()
+    message(STATUS "Benchmarks that are experimental and with LLVM are NOT going to be build,
+  because ${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL is set to
+  ${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL}"
+    )
+  endif()
 else()
-  message(STATUS "Some benchmarks are NOT going to be build, because they are
-  clang's libc++ only."
+  message(STATUS "Benchmarks that requires LLVM libraries are NOT going to be
+  build, because LLVM libraries weren't found locally by CMake."
   )
 endif()
 
@@ -454,6 +478,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   list(APPEND all_benchmarks ${benchmarks_experimental_linux_only})
   list(APPEND all_benchmarks ${benchmarks_experimental_dragonbox})
   list(APPEND all_benchmarks ${benchmarks_experimental_qt_only})
+  list(APPEND all_benchmarks ${benchmarks_experimental_llvm_only})
   list(APPEND all_benchmarks ${benchmarks_which_does_not_have_main_wtf})
 
   foreach(benchmark ${all_benchmarks})

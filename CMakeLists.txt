@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.18)
 
 project(
   fast_io
-  LANGUAGES CXX
+  LANGUAGES CXX C # Notice that plain C here because LLVM librariess' cmake config are broken as
+                  # hell
   VERSION 2.0
 )
 
@@ -58,17 +59,20 @@ foreach(PART ${additional_parts})
   endif()
 endforeach()
 option(${PROJECT_NAME}_CRYPTOPP_CMAKE "If ${PROJECT_NAME}_ENABLE_EXAMPLES is
-turned on, download cryptopp-cmake or try find local cryptopp via *.pc files." NO
+turned on, download cryptopp-cmake or try find local cryptopp via *.pc files."
+YES
 )
 option(${PROJECT_NAME}_TEST_TRY_BOOST_UUID "If ${PROJECT_NAME}_ENABLE_TESTS is
-turned on, try build some tests with Boost::uuid" NO
+turned on, try build some tests with Boost::uuid" YES
 )
 option(${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX "If
 ${PROJECT_NAME}_ENABLE_BENCHMARKS is turned on, try build some benchmarks with
-dragonbox" YES)
+dragonbox" YES
+)
 option(${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC "If
 ${PROJECT_NAME}_ENABLE_BENCHMARKS is turned on, try build some benchmarks with
-mimalloc" YES)
+mimalloc" YES
+)
 
 file(GLOB_RECURSE ${PROJECT_NAME}_headers CONFIGURE_DEPENDS
      "${CMAKE_CURRENT_SOURCE_DIR}/include/**.h"
@@ -103,13 +107,19 @@ if(${${PROJECT_NAME}_ENABLE_FUZZERS})
   add_subdirectory(fuzzing)
 endif()
 
-if(${${PROJECT_NAME}_ENABLE_BENCHMARKS})
-  add_subdirectory(benchmark)
-endif()
-
 if(${${PROJECT_NAME}_ENABLE_TESTS})
   include(CTest)
   add_subdirectory(tests)
+endif()
+
+# notice, all dependencies are optional. If they exist, the CMake script is
+# going to build them something with them.
+include(./cmake/packages/llvm/find_llvm.cmake) # we have to make this once
+# globally, because in another case LLVM's libraries won't be "refindable",
+# because we need them for some benchmarks and examples.
+
+if(${${PROJECT_NAME}_ENABLE_BENCHMARKS})
+  add_subdirectory(benchmark)
 endif()
 
 if(${${PROJECT_NAME}_ENABLE_EXAMPLES})

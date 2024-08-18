@@ -8,11 +8,11 @@ function(apply_to_examples_in_subdir subdir command)
   )
 endfunction()
 
-function(apply_to_sources_example sources_list_name command)
+function(apply_to_sources_examples sources_list_name command)
   apply_for_every_compilation_unit(${sources_list_name} example_${PROJECT_NAME} ${command})
 endfunction()
 
-function(create_exe_default_example name source)
+function(create_exe_default_examples name source)
   cmake_language(CALL create_exe_default "EXAMPLES" ${name} ${source})
 endfunction()
 
@@ -210,7 +210,7 @@ set(examples_i18n
 )
 
 set(examples_llvm_only
-    0019.llvm/construct_llvm_raw_fd_ostream_from_syscall.cc
+    # 0019.llvm/construct_llvm_raw_fd_ostream_from_syscall.cc # static_assert(type_error, "some types are not printable for print on default C's stdout");
 )
 
 # todo something about it?
@@ -274,15 +274,19 @@ set(examples_experimental
 )
 
 set(examples_experimental_qt_only
-    0011.qt/qfile.cc # static_assert(type_error, "some types are not printable for print on default C's stdout"); 
+    0011.qt/qfile.cc # static_assert(type_error, "some types are not printable for print on default C's stdout");
+)
+
+set(examples_experimental_llvm_only
+    0019.llvm/construct_llvm_raw_fd_ostream_from_syscall.cc # static_assert(type_error, "some types are not printable for print on default C's stdout");
 )
 
 # cmake-format: on
 
-apply_to_sources_example(examples_simple create_exe_default_example)
+apply_to_sources_examples(examples_simple create_exe_default_examples)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Android")
-  apply_to_sources_example(examples_android_only create_exe_default_example)
+  apply_to_sources_examples(examples_android_only create_exe_default_examples)
   message(STATUS "Android only example is NOT added as build target.")
 else()
   message(STATUS "Android only example is added as build target.")
@@ -300,8 +304,8 @@ if(NOT ${${PROJECT_NAME}_CRYPTOPP_CMAKE})
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(Cryptopp IMPORTED_TARGET libcryptopp)
   if(Cryptopp_FOUND)
-    apply_to_sources_example(examples_cryptopp create_exe_default_example)
-    apply_to_sources_example(examples_cryptopp link_cryptopp_local)
+    apply_to_sources_examples(examples_cryptopp create_exe_default_examples)
+    apply_to_sources_examples(examples_cryptopp link_cryptopp_local)
     message(STATUS "Examples with CryptoPP are added.")
   else()
     message(
@@ -314,8 +318,8 @@ if(NOT ${${PROJECT_NAME}_CRYPTOPP_CMAKE})
   endif()
 else()
   include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/packages/cryptopp-cmake/add_cryptopp-cmake.cmake)
-  apply_to_sources_example(examples_cryptopp create_exe_default_example)
-  apply_to_sources_example(examples_cryptopp link_cryptopp_cmake)
+  apply_to_sources_examples(examples_cryptopp create_exe_default_examples)
+  apply_to_sources_examples(examples_cryptopp link_cryptopp_cmake)
   message(STATUS "Examples with CryptoPP are added using cryptopp-cmake.")
 endif()
 # examples_cryptopp
@@ -329,8 +333,8 @@ endfunction()
 
 find_package(OpenSSL COMPONENTS Crypto SSL)
 if(${OPENSSL_FOUND})
-  apply_to_sources_example(examples_openssl create_exe_default_example)
-  apply_to_sources_example(examples_openssl link_openssl)
+  apply_to_sources_examples(examples_openssl create_exe_default_examples)
+  apply_to_sources_examples(examples_openssl link_openssl)
   message(STATUS "Examples with OpenSSL are going to be build.")
 else()
   message(STATUS "Examples with OpenSSL are not going to be build because
@@ -349,11 +353,11 @@ endfunction()
 find_package(Qt6 COMPONENTS Core)
 find_package(Qt5 COMPONENTS Core)
 if(${Qt6Core_FOUND})
-  apply_to_sources_example(examples_qt_only create_exe_default_examples)
-  apply_to_sources_example(examples_qt_only link_qt_core)
+  apply_to_sources_examples(examples_qt_only create_exe_default_examples)
+  apply_to_sources_examples(examples_qt_only link_qt_core)
   if(${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL})
-    apply_to_sources_example(examples_experimental_qt_only create_exe_default_examples)
-    apply_to_sources_example(examples_experimental_qt_only link_qt_core)
+    apply_to_sources_examples(examples_experimental_qt_only create_exe_default_examples)
+    apply_to_sources_examples(examples_experimental_qt_only link_qt_core)
     message(STATUS "examples with Qt that are experimental are going to be build.")
   else()
     message(
@@ -364,11 +368,11 @@ if(${Qt6Core_FOUND})
   endif()
   message(STATUS "examples with Qt are going to be build with Qt6.")
 elseif(${Qt5Core_FOUND})
-  apply_to_sources_example(examples_qt_only create_exe_default_examples)
-  apply_to_sources_example(examples_qt_only link_qt_core)
+  apply_to_sources_examples(examples_qt_only create_exe_default_examples)
+  apply_to_sources_examples(examples_qt_only link_qt_core)
   if(${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL})
-    apply_to_sources_example(examples_experimental_qt_only create_exe_default_examples)
-    apply_to_sources_example(examples_experimental_qt_only link_qt_core)
+    apply_to_sources_examples(examples_experimental_qt_only create_exe_default_examples)
+    apply_to_sources_examples(examples_experimental_qt_only link_qt_core)
     message(STATUS "examples with Qt that are experimental are going to be build.")
   else()
     message(
@@ -384,6 +388,35 @@ else()
   )
 endif()
 
+include(../cmake/packages/llvm/find_llvm.cmake)
+message(STATUS "LLVM_INCLUDE_DIRS: ${LLVM_INCLUDE_DIRS}")
+message(STATUS "LLVM_FOUND: ${LLVM_FOUND}")
+message(STATUS "LLVM_VERSION: ${LLVM_VERSION}")
+if(${LLVM_FOUND})
+  apply_to_sources_examples(examples_llvm_only create_exe_default_examples)
+  function(link_llvm name source)
+    target_include_directories(${name} PRIVATE ${LLVM_INCLUDE_DIRS})
+  endfunction()
+  apply_to_sources_examples(examples_llvm_only link_llvm)
+  message(STATUS "examples that requires LLVM libraries are going to be build.")
+
+  if(${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL})
+    apply_to_sources_examples(examples_experimental_llvm_only create_exe_default_examples)
+    apply_to_sources_examples(examples_experimental_llvm_only link_llvm)
+    message(STATUS "Examples that are experimental and require LLVM libraries are going to be build.")
+  else()
+    message(
+      STATUS
+      "Examples that are experimental and require LLVM libraries are NOT going to be build,
+    because ${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL is set to ${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL}."
+    )
+  endif()
+else()
+  message(STATUS "examples that requires LLVM libraries are NOT going to be
+  build, because LLVM libraries weren't found locally by CMake."
+  )
+endif()
+
 function(link_winrt name source)
   set_target_properties(${NAME} PROPERTIES VS_WINRT_COMPONENT TRUE)
 endfunction()
@@ -392,9 +425,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows"
    OR CMAKE_SYSTEM_NAME STREQUAL "Cygwin"
    OR CMAKE_SYSTEM_NAME STREQUAL "Msys"
 )
-  apply_to_sources_example(examples_windows create_exe_default_example)
-  apply_to_sources_example(examples_winrt create_exe_default_example)
-  apply_to_sources_example(examples_winrt link_winrt)
+  apply_to_sources_examples(examples_windows create_exe_default_examples)
+  apply_to_sources_examples(examples_winrt create_exe_default_examples)
+  apply_to_sources_examples(examples_winrt link_winrt)
   message(STATUS "Examples that are Windows-only are going to be build.")
 else()
   message(STATUS "Examples that are Windows-only are NOT going to be build,
@@ -409,8 +442,8 @@ endfunction()
 
 find_package(Lua)
 if(${LUA_FOUND})
-  apply_to_sources_example(examples_lua create_exe_default_example)
-  apply_to_sources_example(examples_lua link_lua)
+  apply_to_sources_examples(examples_lua create_exe_default_examples)
+  apply_to_sources_examples(examples_lua link_lua)
   message(STATUS "Examples with Lua are going to be build.")
 else()
   message(STATUS "Examples with Lua are NOT going to be build, because Lua is
@@ -426,8 +459,8 @@ endfunction()
 
 find_package(Python COMPONENTS Development)
 if(${Python_Development_FOUND})
-  apply_to_sources_example(examples_python create_exe_default_example)
-  apply_to_sources_example(examples_python link_python)
+  apply_to_sources_examples(examples_python create_exe_default_examples)
+  apply_to_sources_examples(examples_python link_python)
   message(STATUS "Examples with Python are going to be build.")
 else()
   message(STATUS "Examples with Python are NOT going to be build, because
@@ -436,7 +469,7 @@ else()
 endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
-  apply_to_sources_example(examples_wasm_only create_exe_default_example)
+  apply_to_sources_examples(examples_wasm_only create_exe_default_examples)
   message(STATUS "Examples with Emscripten, which are WASM only, are going to
   be build."
   )
@@ -453,8 +486,8 @@ endfunction()
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PulseAudio IMPORTED_TARGET libpulse-simple)
 if(${PulseAudio_FOUND})
-  apply_to_sources_example(examples_pulseaudio create_exe_default_example)
-  apply_to_sources_example(examples_pulseaudio link_pulseaudio)
+  apply_to_sources_examples(examples_pulseaudio create_exe_default_examples)
+  apply_to_sources_examples(examples_pulseaudio link_pulseaudio)
   message(STATUS "Examples with PulseAudio's libpulse are going to be build.")
 else()
   message(STATUS "Examples with PulseAudio's libpulse are not going to be build, because
@@ -468,7 +501,7 @@ foreach(subdir ${examples_complex})
 endforeach()
 
 if(${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL})
-  apply_to_sources_example(examples_experimental create_exe_default_example)
+  apply_to_sources_examples(examples_experimental create_exe_default_examples)
   message(STATUS "Examples that are experimental are going to be build.")
 else()
   message(
@@ -495,7 +528,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
     message(DEBUG "Examples files blacklist ${complex}: ${files_blacklist}")
     list(REMOVE_ITEM files ${files_blacklist})
   endforeach()
-  
+
   set(files2 "${files}")
 
   foreach(file ${files})
@@ -522,11 +555,12 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   # list(APPEND all_examples ${examples_todo_cmake})
   list(APPEND all_examples ${examples_experimental})
   list(APPEND all_examples ${examples_experimental_qt_only})
+  list(APPEND all_examples ${examples_experimental_llvm_only})
 
   foreach(example ${all_examples})
     message(DEBUG "all_examples: ${example}")
   endforeach()
-  
+
   foreach(file ${all_examples})
     list(REMOVE_ITEM files ${file})
   endforeach()

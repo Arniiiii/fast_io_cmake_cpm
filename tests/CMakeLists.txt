@@ -168,7 +168,7 @@ set(tests_simple
 
 
 set(tests_boost_uuid
-    0019.boost/uuid.cc # requires boost::uuid
+    # 0019.boost/uuid.cc # error: ‘Iter’ has not been declared inline constexpr char_type *print_reserve_define(io_reserve_type_t<char_type, boost::uuids::uuid>, Iter iter,
 )
 
 
@@ -244,6 +244,10 @@ set(tests_experimental
     0028.io_file/iodeco.cc # error: ‘io_place_type’ is not a member of ‘fast_io’; did you mean ‘io_alias_type’?
 )
 
+set(tests_experimental_boost_uuid
+  0019.boost/uuid.cc # error: ‘Iter’ has not been declared inline constexpr char_type *print_reserve_define(io_reserve_type_t<char_type, boost::uuids::uuid>, Iter iter,
+)
+
 # cmake-format: on
 
 apply_to_sources_tests(tests_simple create_exe_default_test)
@@ -251,11 +255,30 @@ apply_to_sources_tests(tests_simple create_exe_default_test)
 if(${${PROJECT_NAME}_TEST_TRY_BOOST_UUID})
   include(../cmake/packages/boost/add_addboost.cmake)
   set(TRY_BOOST_VERSION "1.86.0")
-  # set(BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED "thread")
+  set(BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED "")
   set(BOOST_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED "uuid")
-  add_boost(TRY_BOOST_VERSION BOOST_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED
-            BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED ${tests_boost_uuid}
-  )
+  # it's a little bit ineffective, but that's ok,
+  function(wrapper_add_boost name source)
+    add_boost(TRY_BOOST_VERSION BOOST_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED
+              BOOST_NOT_HEADER_ONLY_COMPONENTS_THAT_YOU_NEED ${name}
+    )
+  endfunction()
+  apply_to_sources_tests(tests_boost_uuid create_exe_default_test)
+  apply_to_sources_tests(tests_boost_uuid wrapper_add_boost)
+  message(STATUS "Tests that are with Boost::uuid are enabled.")
+  if(${${PROJECT_NAME}_ENABLE_TESTS_EXPERIMENTAL})
+    apply_to_sources_tests(tests_experimental_boost_uuid create_exe_default_test)
+    apply_to_sources_tests(tests_experimental_boost_uuid wrapper_add_boost)
+    message(STATUS "Tests that are experimental and with Boost::uuid are enabled")
+  else()
+    message(
+      STATUS
+      "Tests that are experimental and with Boost::UUID are disabled, because ${PROJECT_NAME}_ENABLE_TESTS_EXPERIMENTAL is set to ${${PROJECT_NAME}_ENABLE_TESTS_EXPERIMENTAL}"
+    )
+  endif()
+else()
+  message(STATUS "Tests that are with Boost::uuid are disabled, because
+  ${PROJECT_NAME}_TEST_TRY_BOOST_UUID is set to ${${PROJECT_NAME}_TEST_TRY_BOOST_UUID}")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows"
@@ -263,10 +286,20 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows"
    OR CMAKE_SYSTEM_NAME STREQUAL "Msys"
 )
   apply_to_sources_tests(tests_windows_only create_exe_default_test)
+  message(STATUS "Tests that are for Windows only are enabled.")
+else()
+  message(STATUS "Tests that are for Windows only are disabled, because CMake
+  thinks you are on a not so Windows-like system. Check yourself: ${CMAKE_SYSTEM_NAME}")
 endif()
 
 if(UNIX)
   apply_to_sources_tests(tests_linux_only create_exe_default_test)
+  message(STATUS "Tests that are UNIX-only are enabled")
+else()
+  message(STATUS "Tests that are UNIX-only are disabled, because it seems
+  CMake has set UNIX to be false? Check:
+  UNIX: ${UNIX}"
+  )
 endif()
 
 apply_to_sources_tests(tests_doesnt_have_main create_library_default_test)
@@ -277,16 +310,21 @@ endforeach()
 
 if(${${PROJECT_NAME}_ENABLE_TESTS_EXPERIMENTAL})
   apply_to_sources_tests(tests_experimental create_exe_default_test)
+  message(STATUS "Tests that are experimental are enabled")
+else()
+  message(
+    STATUS
+      "Tests that are experimental are disabled, because ${PROJECT_NAME}_ENABLE_TESTS_EXPERIMENTAL is set to ${${PROJECT_NAME}_ENABLE_TESTS_EXPERIMENTAL}"
+  )
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
   file(
     GLOB_RECURSE files
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cc ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
   )
-  
+
   set(files2 "${files}")
 
   foreach(file ${files})
@@ -305,6 +343,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   endforeach()
   list(APPEND all_tests ${tests_doesnt_have_main})
   list(APPEND all_tests ${tests_experimental})
+  list(APPEND all_tests ${tests_experimental_boost_uuid})
 
   foreach(test ${all_tests})
     message(DEBUG "all_tests: ${test}")
