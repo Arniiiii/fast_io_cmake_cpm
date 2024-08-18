@@ -8,7 +8,7 @@ function(apply_to_examples_in_subdir subdir command)
   )
 endfunction()
 
-function(apply_to_sources_examples sources_list_name command)
+function(apply_to_sources_example sources_list_name command)
   apply_for_every_compilation_unit(${sources_list_name} example_${PROJECT_NAME} ${command})
 endfunction()
 
@@ -150,7 +150,7 @@ set(examples_simple
     # 0027.filelock/filelock.cc # error: ‘file_lock’ was not declared in this scope
     # 0027.filelock/filelock_request.cc # error: ‘file_lock’ was not declared in this scope
     # 0028.python/pybytes.cc
-    # 0029.containers/constvector.cc # gcc-13 linux : error: ‘__builtin_memcpy(((void*)(& heap )), ((const void*)(&<anonymous>)), 12)’ is not a constant expression
+    # 0029.containers/constvector.cc # error: call to consteval function ‘test()’ is not a constant expression
     0029.containers/vector.cc
     # 0029.containers/vectorinsert.cc # error: no matching function for call to v2.insert(v2.begin() + 1, {3, 4, 5});
     0029.containers/vectorvector.cc
@@ -197,7 +197,7 @@ set(examples_openssl
 
 set(examples_qt
     0011.qt/construct_qtextstream_from_syscall.cc
-    0011.qt/qfile.cc
+    # 0011.qt/qfile.cc # static_assert(type_error, "some types are not printable for print on default C's stdout");
     0011.qt/qstring.cc
     0011.qt/qstring_concat.cc
     0011.qt/qstring_get.cc
@@ -268,17 +268,21 @@ set(examples_experimental
     0027.filelock/buffered_file_with_file_lock.cc # error: ‘file_lock’ was not declared in this scope
     0027.filelock/filelock.cc # error: ‘file_lock’ was not declared in this scope
     0027.filelock/filelock_request.cc # error: ‘file_lock’ was not declared in this scope
-    0029.containers/constvector.cc # gcc-13 linux : error: ‘__builtin_memcpy(((void*)(& heap )), ((const void*)(&<anonymous>)), 12)’ is not a constant expression
+    0029.containers/constvector.cc # # error: call to consteval function ‘test()’ is not a constant expression
     0029.containers/vectorinsert.cc # error: no matching function for call to v2.insert(v2.begin() + 1, {3, 4, 5});
     0030.binary_serialization/lec559_lebe.cc # error: invalid conversion from ‘const char*’ to ‘char_type*’ {aka ‘char*’} [-fpermissive]
 )
 
+set(examples_experimental_qt_only
+    0011.qt/qfile.cc # static_assert(type_error, "some types are not printable for print on default C's stdout"); 
+)
+
 # cmake-format: on
 
-apply_to_sources_examples(examples_simple create_exe_default_example)
+apply_to_sources_example(examples_simple create_exe_default_example)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Android")
-  apply_to_sources_examples(examples_android_only create_exe_default_example)
+  apply_to_sources_example(examples_android_only create_exe_default_example)
   message(STATUS "Android only example is NOT added as build target.")
 else()
   message(STATUS "Android only example is added as build target.")
@@ -296,8 +300,8 @@ if(NOT ${${PROJECT_NAME}_CRYPTOPP_CMAKE})
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(Cryptopp IMPORTED_TARGET libcryptopp)
   if(Cryptopp_FOUND)
-    apply_to_sources_examples(examples_cryptopp create_exe_default_example)
-    apply_to_sources_examples(examples_cryptopp link_cryptopp_local)
+    apply_to_sources_example(examples_cryptopp create_exe_default_example)
+    apply_to_sources_example(examples_cryptopp link_cryptopp_local)
     message(STATUS "Examples with CryptoPP are added.")
   else()
     message(
@@ -310,8 +314,8 @@ if(NOT ${${PROJECT_NAME}_CRYPTOPP_CMAKE})
   endif()
 else()
   include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/packages/cryptopp-cmake/add_cryptopp-cmake.cmake)
-  apply_to_sources_examples(examples_cryptopp create_exe_default_example)
-  apply_to_sources_examples(examples_cryptopp link_cryptopp_cmake)
+  apply_to_sources_example(examples_cryptopp create_exe_default_example)
+  apply_to_sources_example(examples_cryptopp link_cryptopp_cmake)
   message(STATUS "Examples with CryptoPP are added using cryptopp-cmake.")
 endif()
 # examples_cryptopp
@@ -325,8 +329,8 @@ endfunction()
 
 find_package(OpenSSL COMPONENTS Crypto SSL)
 if(${OPENSSL_FOUND})
-  apply_to_sources_examples(examples_openssl create_exe_default_example)
-  apply_to_sources_examples(examples_openssl link_openssl)
+  apply_to_sources_example(examples_openssl create_exe_default_example)
+  apply_to_sources_example(examples_openssl link_openssl)
   message(STATUS "Examples with OpenSSL are going to be build.")
 else()
   message(STATUS "Examples with OpenSSL are not going to be build because
@@ -345,17 +349,38 @@ endfunction()
 find_package(Qt6 COMPONENTS Core)
 find_package(Qt5 COMPONENTS Core)
 if(${Qt6Core_FOUND})
-  apply_to_sources_examples(examples_qt create_exe_default_example)
-  apply_to_sources_examples(examples_qt link_qt_core)
-  message(STATUS "Examples with Qt are going to be build with Qt6.")
+  apply_to_sources_example(examples_qt_only create_exe_default_examples)
+  apply_to_sources_example(examples_qt_only link_qt_core)
+  if(${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL})
+    apply_to_sources_example(examples_experimental_qt_only create_exe_default_examples)
+    apply_to_sources_example(examples_experimental_qt_only link_qt_core)
+    message(STATUS "examples with Qt that are experimental are going to be build.")
+  else()
+    message(
+      STATUS
+        "examples with Qt that are experimental are NOT going to
+    be build because ${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL is set to ${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL}"
+    )
+  endif()
+  message(STATUS "examples with Qt are going to be build with Qt6.")
 elseif(${Qt5Core_FOUND})
-  apply_to_sources_examples(examples_qt create_exe_default_example)
-  apply_to_sources_examples(examples_qt link_qt_core)
-  message(STATUS "Examples with Qt are going to be build with Qt5.")
+  apply_to_sources_example(examples_qt_only create_exe_default_examples)
+  apply_to_sources_example(examples_qt_only link_qt_core)
+  if(${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL})
+    apply_to_sources_example(examples_experimental_qt_only create_exe_default_examples)
+    apply_to_sources_example(examples_experimental_qt_only link_qt_core)
+    message(STATUS "examples with Qt that are experimental are going to be build.")
+  else()
+    message(
+      STATUS
+        "examples with Qt that are experimental are NOT going to
+    be build because ${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL is set to ${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL}"
+    )
+  endif()
+  message(STATUS "examples with Qt are going to be build with Qt5.")
 else()
-  message(
-    STATUS
-      "Examples with Qt are not going to be build, because local neither Qt6 nor Qt5 are found."
+  message(STATUS "examples with Qt are NOT going to be build, because CMake
+  could not find a local Qt6 or Qt5."
   )
 endif()
 
@@ -367,9 +392,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows"
    OR CMAKE_SYSTEM_NAME STREQUAL "Cygwin"
    OR CMAKE_SYSTEM_NAME STREQUAL "Msys"
 )
-  apply_to_sources_examples(examples_windows create_exe_default_example)
-  apply_to_sources_examples(examples_winrt create_exe_default_example)
-  apply_to_sources_examples(examples_winrt link_winrt)
+  apply_to_sources_example(examples_windows create_exe_default_example)
+  apply_to_sources_example(examples_winrt create_exe_default_example)
+  apply_to_sources_example(examples_winrt link_winrt)
   message(STATUS "Examples that are Windows-only are going to be build.")
 else()
   message(STATUS "Examples that are Windows-only are NOT going to be build,
@@ -384,8 +409,8 @@ endfunction()
 
 find_package(Lua)
 if(${LUA_FOUND})
-  apply_to_sources_examples(examples_lua create_exe_default_example)
-  apply_to_sources_examples(examples_lua link_lua)
+  apply_to_sources_example(examples_lua create_exe_default_example)
+  apply_to_sources_example(examples_lua link_lua)
   message(STATUS "Examples with Lua are going to be build.")
 else()
   message(STATUS "Examples with Lua are NOT going to be build, because Lua is
@@ -401,8 +426,8 @@ endfunction()
 
 find_package(Python COMPONENTS Development)
 if(${Python_Development_FOUND})
-  apply_to_sources_examples(examples_python create_exe_default_example)
-  apply_to_sources_examples(examples_python link_python)
+  apply_to_sources_example(examples_python create_exe_default_example)
+  apply_to_sources_example(examples_python link_python)
   message(STATUS "Examples with Python are going to be build.")
 else()
   message(STATUS "Examples with Python are NOT going to be build, because
@@ -411,7 +436,7 @@ else()
 endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
-  apply_to_sources_examples(examples_wasm_only create_exe_default_example)
+  apply_to_sources_example(examples_wasm_only create_exe_default_example)
   message(STATUS "Examples with Emscripten, which are WASM only, are going to
   be build."
   )
@@ -428,8 +453,8 @@ endfunction()
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PulseAudio IMPORTED_TARGET libpulse-simple)
 if(${PulseAudio_FOUND})
-  apply_to_sources_examples(examples_pulseaudio create_exe_default_example)
-  apply_to_sources_examples(examples_pulseaudio link_pulseaudio)
+  apply_to_sources_example(examples_pulseaudio create_exe_default_example)
+  apply_to_sources_example(examples_pulseaudio link_pulseaudio)
   message(STATUS "Examples with PulseAudio's libpulse are going to be build.")
 else()
   message(STATUS "Examples with PulseAudio's libpulse are not going to be build, because
@@ -443,7 +468,7 @@ foreach(subdir ${examples_complex})
 endforeach()
 
 if(${${PROJECT_NAME}_ENABLE_EXAMPLES_EXPERIMENTAL})
-  apply_to_sources_examples(examples_experimental create_exe_default_example)
+  apply_to_sources_example(examples_experimental create_exe_default_example)
   message(STATUS "Examples that are experimental are going to be build.")
 else()
   message(
@@ -496,6 +521,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   list(APPEND all_examples ${examples_pulseaudio})
   # list(APPEND all_examples ${examples_todo_cmake})
   list(APPEND all_examples ${examples_experimental})
+  list(APPEND all_examples ${examples_experimental_qt_only})
 
   foreach(example ${all_examples})
     message(DEBUG "all_examples: ${example}")

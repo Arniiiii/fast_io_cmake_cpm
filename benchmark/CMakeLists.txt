@@ -203,10 +203,10 @@ set(benchmarks_linux_only
 
 set(benchmarks_qt_only
     0007.concat/concat_qstring.cc
-    0010.line/scan_qstring.cc
-    0010.line/scan_qstring_u16utf8.cc
-    0015.string/scan_qstring.cc
-    0015.string/scan_qstring_u16utf8.cc
+    # 0010.line/scan_qstring.cc # error: ‘non_overlapped_copy_n’ was not declared in this scope
+    # 0010.line/scan_qstring_u16utf8.cc # error: ‘u16iutf8_file’ is not a member of ‘fast_io’; did you mean ‘u16ibuf_file’?
+    # 0015.string/scan_qstring.cc # error: ‘non_overlapped_copy_n’ was not declared in this scope
+    # 0015.string/scan_qstring_u16utf8.cc # error: ‘u16iutf8_file’ is not a member of ‘fast_io’
 )
 
 set(benchmarks_dragonbox_only
@@ -280,6 +280,13 @@ set(benchmarks_experimental_dragonbox
     0008/seperate_short/dragonbox_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’
 )
 
+set(benchmarks_experimental_qt_only
+    0010.line/scan_qstring.cc # error: ‘non_overlapped_copy_n’ was not declared in this scope
+    0010.line/scan_qstring_u16utf8.cc # error: ‘u16iutf8_file’ is not a member of ‘fast_io’; did you mean ‘u16ibuf_file’?
+    0015.string/scan_qstring.cc # error: ‘non_overlapped_copy_n’ was not declared in this scope
+    0015.string/scan_qstring_u16utf8.cc # error: ‘u16iutf8_file’ is not a member of ‘fast_io’
+)
+
 set(benchmarks_which_does_not_have_main_wtf
   0012.isa/sha512.cc
 )
@@ -303,6 +310,15 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   apply_to_sources_benchmark(benchmarks_linux_only create_exe_default_benchmarks)
   message(STATUS "Benchmarks that are Linux-only are going to be build.")
+  if(${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL})
+    apply_to_sources_benchmark(benchmarks_experimental_linux_only create_exe_default_benchmarks)
+    message(STATUS "Benchmarks that are experimental and for Linux only are going to be build.")
+  else()
+    message(STATUS "Benchmarks that are experimental and for Linux only are
+    NOT going to be build, because ${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL is set to
+  ${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL}"
+    )
+  endif()
 else()
   message(STATUS "Benchmarks that are Linux-only are NOT going to be build,
   because CMake thinks you are not on Linux."
@@ -315,10 +331,32 @@ find_package(Qt6 COMPONENTS Core)
 if(${Qt6Core_FOUND})
   apply_to_sources_benchmark(benchmarks_qt_only create_exe_default_benchmarks)
   apply_to_sources_benchmark(benchmarks_qt_only link_qt_core)
+  if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL})
+    apply_to_sources_benchmark(benchmarks_experimental_qt_only create_exe_default_benchmarks)
+    apply_to_sources_benchmark(benchmarks_experimental_qt_only link_qt_core)
+    message(STATUS "Benchmarks with Qt that are experimental are going to be build.")
+  else()
+    message(
+      STATUS
+        "Benchmarks with Qt that are experimental are NOT going to
+    be build because ${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL is set to ${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL}"
+    )
+  endif()
   message(STATUS "Benchmarks with Qt are going to be build with Qt6.")
 elseif(${Qt5Core_FOUND})
   apply_to_sources_benchmark(benchmarks_qt_only create_exe_default_benchmarks)
   apply_to_sources_benchmark(benchmarks_qt_only link_qt_core)
+  if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL})
+    apply_to_sources_benchmark(benchmarks_experimental_qt_only create_exe_default_benchmarks)
+    apply_to_sources_benchmark(benchmarks_experimental_qt_only link_qt_core)
+    message(STATUS "Benchmarks with Qt that are experimental are going to be build.")
+  else()
+    message(
+      STATUS
+        "Benchmarks with Qt that are experimental are NOT going to
+    be build because ${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL is set to ${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL}"
+    )
+  endif()
   message(STATUS "Benchmarks with Qt are going to be build with Qt5.")
 else()
   message(STATUS "Benchmarks with Qt are NOT going to be build, because CMake
@@ -334,6 +372,15 @@ if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX})
   apply_to_sources_benchmark(benchmarks_dragonbox_only create_exe_default_benchmarks)
   apply_to_sources_benchmark(benchmarks_dragonbox_only link_dragonbox)
   message(STATUS "Benchmarks with dragonbox are going to be build.")
+  if(${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL})
+    apply_to_sources_benchmark(benchmarks_experimental_dragonbox create_exe_default_benchmarks)
+    message(STATUS "Benchmarks that are experimental and with Dragonbox are going to be build.")
+  else()
+    message(STATUS "Benchmarks that are experimental and with dragonbox are NOT going to be build,
+  because ${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL is set to
+  ${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL}"
+    )
+  endif()
 else()
   message(
     STATUS
@@ -369,23 +416,6 @@ endif()
 if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL})
   apply_to_sources_benchmark(benchmarks_experimental create_exe_default_benchmarks)
   message(STATUS "Benchmarks that are experimental are going to be build.")
-  if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-    apply_to_sources_benchmark(benchmarks_experimental_linux_only create_exe_default_benchmarks)
-    message(STATUS "Benchmarks that are experimental and for Linux only are going to be build.")
-  else()
-    message(STATUS "Benchmarks that are experimental and for Linux only are
-    NOT going to be build, because system seems to be not Linux"
-    )
-  endif()
-  if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX})
-    apply_to_sources_benchmark(benchmarks_experimental_dragonbox create_exe_default_benchmarks)
-    message(STATUS "Benchmarks that are experimental and with Dragonbox are going to be build.")
-  else()
-    message(
-      STATUS
-        "Benchmarks that are experimental and with dragonbox are NOT going to be build, because ${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX is set to ${${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX}."
-    )
-  endif()
 else()
   message(STATUS "Benchmarks that are experimental are NOT going to be build,
   becuase ${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL is set to
@@ -423,6 +453,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   list(APPEND all_benchmarks ${benchmarks_experimental})
   list(APPEND all_benchmarks ${benchmarks_experimental_linux_only})
   list(APPEND all_benchmarks ${benchmarks_experimental_dragonbox})
+  list(APPEND all_benchmarks ${benchmarks_experimental_qt_only})
   list(APPEND all_benchmarks ${benchmarks_which_does_not_have_main_wtf})
 
   foreach(benchmark ${all_benchmarks})
