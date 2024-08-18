@@ -1,6 +1,6 @@
 ﻿#include <vector>
 #include <cstdint>
-#include <mimalloc-2.0/mimalloc.h>
+#include <mimalloc.h>
 namespace test
 {
 template <typename T>

@@ -1,11 +1,10 @@
 # include(${CMAKE_CURRENT_LIST_DIR}/../cmake/get_subdirs.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../cmake/apply.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../cmake/create_default_target.cmake)
 
 function(apply_to_sources_benchmark sources_list_name command)
   apply_for_every_compilation_unit(${sources_list_name} benchmark_${PROJECT_NAME} ${command})
 endfunction()
-
-include(${CMAKE_CURRENT_LIST_DIR}/../cmake/create_exe_default.cmake)
 
 function(create_exe_default_benchmarks name source)
   cmake_language(CALL create_exe_default "BENCHMARKS" ${name} ${source})
@@ -30,9 +29,9 @@ endfunction()
 #   message(DEBUG "Benchmarks *.cc: ${file}")
 # endforeach()
 
-set(simple_benchmarks
+set(benchmarks_simple
     # 0001.refterm/filebuf_file.cc
-    0001.refterm/fpipe.cc
+    # 0001.refterm/fpipe.cc
     # 0001.refterm/fstream.cc
     0001.refterm/iostream.cc
     0001.refterm/out_buf.cc
@@ -44,11 +43,11 @@ set(simple_benchmarks
     0002.file_io_tsc/c_file_unlocked_tsc.cc
     0002.file_io_tsc/iobuf_file_tsc.cc
     0002.file_io_tsc/longspaces/fstream.cc
-    0002.file_io_tsc/longspaces/iobuf_file.cc
-    0002.file_io_tsc/longspaces/iobuf_file_verify.cc
+    # 0002.file_io_tsc/longspaces/iobuf_file.cc
+    # 0002.file_io_tsc/longspaces/iobuf_file_verify.cc
     0002.file_io_tsc/longspaces/stdio.cc
-    0002.file_io_tsc/longspaces/u32iobuf_file.cc
-    0002.file_io_tsc/longspaces/u32utf8_file.cc
+    # 0002.file_io_tsc/longspaces/u32iobuf_file.cc
+    # 0002.file_io_tsc/longspaces/u32utf8_file.cc
     0002.file_io_tsc/random/c_file.cc
     0002.file_io_tsc/random/filebuf_file.cc
     0002.file_io_tsc/random/iobuf_file.cc
@@ -58,31 +57,31 @@ set(simple_benchmarks
     0002.file_io_tsc/time/c_file.cc
     0002.file_io_tsc/time/c_file_unlocked.cc
     0002.file_io_tsc/time/c_file_unlocked_text.cc
-    0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file.cc
-    0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file_l10n.cc
+    # 0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file.cc
+    # 0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file_l10n.cc
     0002.file_io_tsc/time/filebuf_file.cc
     0002.file_io_tsc/time/fstream.cc
     0002.file_io_tsc/time/fstream_std_format.cc
     0002.file_io_tsc/time/fstreamtext.cc
     0002.file_io_tsc/time/iobuf_file.cc
     0002.file_io_tsc/time/iobuf_file_be32.cc
-    0002.file_io_tsc/time/iobuf_file_bin.cc
+    # 0002.file_io_tsc/time/iobuf_file_bin.cc
     0002.file_io_tsc/time/iobuf_file_concatln.cc
-    0002.file_io_tsc/time/iobuf_file_l10n.cc
+    # 0002.file_io_tsc/time/iobuf_file_l10n.cc
     0002.file_io_tsc/time/iobuf_file_le32.cc
     0002.file_io_tsc/time/iobuf_file_leb128.cc
     0002.file_io_tsc/time/iobuf_file_mutex.cc
-    0002.file_io_tsc/time/iobuf_file_mutex_big.cc
+    # 0002.file_io_tsc/time/iobuf_file_mutex_big.cc
     0002.file_io_tsc/time/iobuf_file_std_format.cc
     0002.file_io_tsc/time/iobuf_file_std_format_locale.cc
-    0002.file_io_tsc/time/iobuf_file_unsafe_rt_fprint.cc
-    0002.file_io_tsc/time/iobuf_file_unsafe_rt_fprint_l10n.cc
+    # 0002.file_io_tsc/time/iobuf_file_unsafe_rt_fprint.cc
+    # 0002.file_io_tsc/time/iobuf_file_unsafe_rt_fprint_l10n.cc
     0002.file_io_tsc/time/iobuf_io_file.cc
     0002.file_io_tsc/time/iobuf_io_file_eol.cc
     0002.file_io_tsc/time/iobuf_io_file_eol_dbg.cc
     0002.file_io_tsc/time/iobuf_io_file_lf_cr.cc
     0002.file_io_tsc/time/iobuf_io_file_lf_crlf.cc
-    0002.file_io_tsc/time/llvm_raw_fd_ostream.cc
+    # 0002.file_io_tsc/time/llvm_raw_fd_ostream.cc
     0002.file_io_tsc/time/stdio.cc
     0002.file_io_tsc/time/stdiotext.cc
     0002.file_io_tsc/time/u32iobuf_file.cc
@@ -90,21 +89,21 @@ set(simple_benchmarks
     0003.file_io_hex/fstream.cc
     0003.file_io_hex/fstream_locale.cc
     0003.file_io_hex/iobuf_file.cc
-    0003.file_io_hex/iobuf_file_addrvw.cc
-    0003.file_io_hex/iobuf_file_l10n.cc
-    0004.file_io_floating/charconv_general.cc
-    0004.file_io_floating/charconv_general_float.cc
-    0004.file_io_floating/charconv_hexfloat.cc
-    0004.file_io_floating/charconv_hexfloat_float.cc
+    # 0003.file_io_hex/iobuf_file_addrvw.cc
+    # 0003.file_io_hex/iobuf_file_l10n.cc
+    # 0004.file_io_floating/charconv_general.cc
+    # 0004.file_io_floating/charconv_general_float.cc
+    # 0004.file_io_floating/charconv_hexfloat.cc
+    # 0004.file_io_floating/charconv_hexfloat_float.cc
     0004.file_io_floating/decimal.cc
     0004.file_io_floating/decimal_float.cc
-    0004.file_io_floating/decimal_l10n.cc
+    # 0004.file_io_floating/decimal_l10n.cc
     0004.file_io_floating/general.cc
     0004.file_io_floating/general_float.cc
-    0004.file_io_floating/general_l10n.cc
+    # 0004.file_io_floating/general_l10n.cc
     0004.file_io_floating/hexfloat.cc
     0004.file_io_floating/hexfloat_float.cc
-    0005.time/fast_io.cc
+    # 0005.time/fast_io.cc
     # 0005.time/glibc_nl_langinfo.cc
     0005.time/iso8601.cc
     # 0005.time/put_time.cc
@@ -114,36 +113,36 @@ set(simple_benchmarks
     # 0007.concat/concat_cstring.cc
     # 0007.concat/concat_hstring.cc
     # 0007.concat/concat_qstring.cc
-    0007.concat/concat_std.cc
-    0007.concat/concat_string.cc
+    # 0007.concat/concat_std.cc
+    # 0007.concat/concat_string.cc
     # 0007.concat/concat_vs_format.cc
     # 0007.concat/to_hstring.cc
     0008/seperate/charconv.cc
-    0008/seperate/charconv_no_c_str.cc
+    # 0008/seperate/charconv_no_c_str.cc
     # 0008/seperate/dragonbox.cc
     # 0008/seperate/dragonbox_no_c_str.cc
     0008/seperate/fast_io.cc
     0008/seperate/fast_io_direct.cc
-    0008/seperate/fast_io_no_c_str.cc
-    0008/seperate_short/charconv_no_c_str.cc
+    # 0008/seperate/fast_io_no_c_str.cc
+    # 0008/seperate_short/charconv_no_c_str.cc
     # 0008/seperate_short/dragonbox_no_c_str.cc
-    0008/seperate_short/fast_io_no_c_str.cc
+    # 0008/seperate_short/fast_io_no_c_str.cc
     0009.concatstring/concat.cc
     0009.concatstring/format.cc
     0009.concatstring/stringstream.cc
     0009.concatstring/tostring.cc
-    0010.line/contiguous_line_scanner.cc
+    # 0010.line/contiguous_line_scanner.cc
     0010.line/getline.cc
     0010.line/line_get.cc
     0010.line/line_get_fbf.cc
-    0010.line/line_scanner.cc
+    # 0010.line/line_scanner.cc
     0010.line/random_data.cc
     # 0010.line/scan_qstring.cc
     # 0010.line/scan_qstring_u16utf8.cc
     0010.line/scan_strlike.cc
-    0010.line/scan_u16string_u16utf8.cc
+    # 0010.line/scan_u16string_u16utf8.cc
     # 0010.line/scan_winrt_hstring.cc
-    0011.containers/list/0000.algos/fast_io.cc
+    # 0011.containers/list/0000.algos/fast_io.cc
     0011.containers/list/0000.algos/std.cc
     0011.containers/list/0002.multi_push_back/fast_io.cc
     0011.containers/list/0002.multi_push_back/std.cc
@@ -162,8 +161,8 @@ set(simple_benchmarks
     0013.bitset/u8c_file.cc
     0013.bitset/u8c_file_unlocked.cc
     0013.bitset/u8obuf_file.cc
-    0014.codecvt/u16utf8_file.cc
-    0014.codecvt/u32utf8_file.cc
+    # 0014.codecvt/u16utf8_file.cc
+    # 0014.codecvt/u32utf8_file.cc
     0014.codecvt/u8iobuf_file.cc
     0015.string/istream.cc
     0015.string/random_data.cc
@@ -172,7 +171,7 @@ set(simple_benchmarks
     # 0015.string/scan_qstring.cc
     # 0015.string/scan_qstring_u16utf8.cc
     0015.string/scan_strlike.cc
-    0015.string/scan_u16string_u16utf8.cc
+    # 0015.string/scan_u16string_u16utf8.cc
     # 0015.string/scan_winrt_hstring.cc
     0016.endl/filebuf_file.cc
     0016.endl/ofstream.cc
@@ -189,6 +188,7 @@ set(simple_benchmarks
 
 set(benchmarks_windows_only
     0001.refterm/filebuf_file.cc
+    0001.refterm/fpipe.cc
     0001.refterm/fstream.cc
     0007.concat/concat_cstring.cc
     0007.concat/to_hstring.cc
@@ -199,7 +199,7 @@ set(benchmarks_windows_only
 )
 
 set(benchmarks_linux_only
-    0005.time/glibc_nl_langinfo.cc
+    # 0005.time/glibc_nl_langinfo.cc # error: cannot convert ‘fast_io::obuf_file’ to int
     0005.time/put_time.cc
     0017.syscalls/posix_file.cc
 )
@@ -214,56 +214,137 @@ set(benchmarks_qt_only
 
 set(benchmarks_dragonbox_only
     0008/seperate/dragonbox.cc
-    0008/seperate/dragonbox_no_c_str.cc
-    0008/seperate_short/dragonbox_no_c_str.cc
+    # 0008/seperate/dragonbox_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’
+    # 0008/seperate_short/dragonbox_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’
 )
 
 set(benchmarks_mimalloc_only
     0011.containers/list/0002.multi_push_back/std_mimalloc.cc
     0011.containers/vector/0002.multi_push_back/std_mimalloc.cc
 )
+
+set(benchmarks_llvm_only
+    0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file.cc
+    0002.file_io_tsc/time/fast_io_llvm_raw_fd_ostream_file_l10n.cc
+    0002.file_io_tsc/time/llvm_raw_fd_ostream.cc
+)
+
+set(benchmarks_experimental
+    0002.file_io_tsc/longspaces/iobuf_file.cc #  error: ‘char_type’ in ‘using fast_io::obuf_file = fast_io::basic_obuf_file<char>’  does not name a type
+    0002.file_io_tsc/longspaces/iobuf_file_verify.cc # error: ‘char_type’ in ‘using fast_io::obuf_file = fast_io::basic_obuf_file<char>’ does not name a type
+    0002.file_io_tsc/longspaces/u32utf8_file.cc # error: ‘u32outf8_file’ is not a member of ‘fast_io’; did you mean ‘u32obuf_file’?
+    0002.file_io_tsc/time/iobuf_file_bin.cc # error: cannot convert ‘fast_io::obuf_file’ to int
+    0002.file_io_tsc/time/iobuf_file_l10n.cc # error: ‘buffer_output_stream’ has not been declared
+    0002.file_io_tsc/time/iobuf_file_mutex_big.cc # error: ‘using fast_io::io_lock_guard<...>  has no member named ‘lock’
+    0002.file_io_tsc/time/iobuf_file_unsafe_rt_fprint.cc # maybe WinRT only? # error: ‘unsafe_rt_format_string_view’ in namespace ‘fast_io’ does not name a type
+    0002.file_io_tsc/time/iobuf_file_unsafe_rt_fprint_l10n.cc # maybe WinRT only? # error: ‘buffer_output_stream’ has not been declared
+    0003.file_io_hex/iobuf_file_addrvw.cc #  error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
+    0003.file_io_hex/iobuf_file_l10n.cc # error: ‘buffer_output_stream’ has not been declared
+    0004.file_io_floating/charconv_general.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
+    0004.file_io_floating/charconv_general_float.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
+    0004.file_io_floating/charconv_hexfloat.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
+    0004.file_io_floating/charconv_hexfloat_float.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
+    0004.file_io_floating/decimal_l10n.cc # error: ‘buffer_output_stream’ has not been declared
+    0004.file_io_floating/general_l10n.cc # error: ‘buffer_output_stream’ has not been declared
+    0005.time/fast_io.cc # error: ‘buffer_output_stream’ has not been declared
+    0007.concat/concat_std.cc #  error: ‘concatln_std’ is not a member of ‘fast_io’
+    0007.concat/concat_string.cc # error: ‘concatln’ is not a member of ‘fast_io’
+    0008/seperate/charconv_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
+    0008/seperate/fast_io_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
+    0008/seperate_short/charconv_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
+    0008/seperate_short/fast_io_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
+    0010.line/contiguous_line_scanner.cc # error: ‘line_scanner’ was not declared in this scope
+    0010.line/line_scanner.cc # error: ‘line_scanner’ was not declared in this scope
+    0010.line/scan_u16string_u16utf8.cc # error: ‘u16iutf8_file’ is not a member of ‘fast_io’
+    0011.containers/list/0000.algos/fast_io.cc # error: no matching function for call to ::fast_io::list<::std::size_t> lst(vec.begin(),vec.end());
+    0014.codecvt/u16utf8_file.cc # error: ‘u16outf8_file’ is not a member of ‘fast_io’
+    0014.codecvt/u32utf8_file.cc # error: ‘u32outf8_file’ is not a member of ‘fast_io
+    0015.string/scan_u16string_u16utf8.cc # error: ‘u16iutf8_file’ is not a member of ‘fast_io’
+)
+
 # cmake-format: on
 
-set(benchmarks_to_compile ${simple_benchmarks})
+apply_to_sources_benchmark(benchmarks_simple create_exe_default_benchmarks)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows"
    OR CMAKE_SYSTEM_NAME STREQUAL "Cygwin"
    OR CMAKE_SYSTEM_NAME STREQUAL "Msys"
 )
-  list(APPEND benchmarks_to_compile ${benchmarks_windows_only})
+  apply_to_sources_benchmark(benchmarks_windows_only create_exe_default_benchmarks)
+  message(STATUS "Benchmarks that are Windows-only are going to be build.")
+else()
+  message(STATUS "Benchmarks that are Windows-only are NOT going to be build, because
+  CMake thinks you are not on something Windows-like"
+  )
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  list(APPEND benchmarks_to_compile ${benchmarks_linux_only})
+  apply_to_sources_benchmark(benchmarks_linux_only create_exe_default_benchmarks)
+  message(STATUS "Benchmarks that are Linux-only are going to be build.")
+else()
+  message(STATUS "Benchmarks that are Linux-only are NOT going to be build,
+  because CMake thinks you are not on Linux."
+  )
 endif()
 
 find_package(Qt5 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Core)
 if(${QT5_FOUND} OR ${QT6_FOUND})
-  list(APPEND benchmarks_to_compile ${benchmarks_qt_only})
-endif()
-
-list(APPEND benchmarks_to_compile ${benchmarks_dragonbox_only})
-list(APPEND benchmarks_to_compile ${benchmarks_mimalloc_only})
-
-apply_to_sources_benchmark(benchmarks_to_compile create_exe_default_benchmarks)
-
-if(${QT5_FOUND} OR ${QT6_FOUND})
+  apply_to_sources_benchmark(benchmarks_qt_only create_exe_default_benchmarks)
   apply_to_sources_benchmark(benchmarks_qt_only link_qt_core)
+  message(STATUS "Benchmarks with Qt are going to be build.")
+else()
+  message(STATUS "Benchmarks with Qt are NOT going to be build, because CMake
+  could not find a local Qt5 or Qt6."
+  )
 endif()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/packages/dragonbox/add_dragonbox.cmake)
+if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX})
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/packages/dragonbox/add_dragonbox.cmake)
+  function(link_dragonbox name source)
+    target_link_libraries(${name} PRIVATE dragonbox::dragonbox dragonbox::dragonbox_to_chars)
+  endfunction()
+  apply_to_sources_benchmark(benchmarks_dragonbox_only create_exe_default_benchmarks)
+  apply_to_sources_benchmark(benchmarks_dragonbox_only link_dragonbox)
+  message(STATUS "Benchmarks with dragonbox are going to be build.")
+else()
+  message(STATUS "Benchmarks with dragonbox are NOT going to be build, because
+  ${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX is set to
+  ${${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX}."
+  )
+endif()
 
-function(link_dragonbox name source)
-  target_link_libraries(${name} PRIVATE dragonbox::dragonbox)
-endfunction()
+if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC})
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/packages/mimalloc/add_mimalloc.cmake)
+  function(link_mimalloc name source)
+    target_link_libraries(${name} PRIVATE mimalloc-static)
+  endfunction()
+  apply_to_sources_benchmark(benchmarks_mimalloc_only create_exe_default_benchmarks)
+  apply_to_sources_benchmark(benchmarks_mimalloc_only link_mimalloc)
+  message(STATUS "Benchmarks with mimalloc are going to be build.")
+else()
+  message(STATUS "Benchmarks with mimalloc are NOT going to be build, because
+  ${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC is set to
+  ${${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC}."
+  )
+endif()
 
-apply_to_sources_benchmark(benchmarks_dragonbox_only link_dragonbox)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # using regular Clang or AppleClang
+  apply_to_sources_benchmark(benchmarks_llvm_only create_exe_default_benchmarks)
+  message(STATUS "Benchmarks that are clang-only are going to be build.")
+else()
+  message(STATUS "Some benchmarks are NOT going to be build, because they are
+  clang's libc++ only."
+  )
+endif()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/packages/mimalloc/add_mimalloc.cmake)
-
-function(link_mimalloc name source)
-  target_link_libraries(${name} PRIVATE mimalloc_static)
-endfunction()
-
-apply_to_sources_benchmark(benchmarks_mimalloc_only link_mimalloc)
+if(${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL})
+  apply_to_sources_benchmark(benchmarks_experimental create_exe_default_benchmarks)
+  message(STATUS "Benchmarks that are experimental are going to be build.")
+else()
+  message(STATUS "Benchmarks that are experimental are NOT going to be build,
+  becuase ${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL is set to
+  ${${PROJECT_NAME}_ENABLE_BENCHMARKS_EXPERIMENTAL}"
+  )
+endif()

@@ -41,7 +41,8 @@ function(compilelocaleencoding encoding localelist)
           ${purfilename}.${encoding} MODULE
           "${CMAKE_SOURCE_DIR}/src/i18n_data/locale/${localelist}.cc"
         )
-        set_target_properties(${purfilename}.${encoding} PROPERTIES CXX_STANDARD 20)
+        set_target_properties(${purfilename}.${encoding} PROPERTIES
+          CXX_STANDARD ${${PROJECT_NAME}_CXX_STANDARD})
         set_target_properties(
           ${purfilename}.${encoding} PROPERTIES OUTPUT_NAME ${filename}.${encoding}
         )

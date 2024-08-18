@@ -30,9 +30,15 @@ else()
   set(${PROJECT_NAME}_DEFAULT_VAL OFF)
 endif()
 
+set(${PROJECT_NAME}_CXX_STANDARD
+    26
+    CACHE STRING "Use specific standard of c++"
+)
+set_property(CACHE ${PROJECT_NAME}_CXX_STANDARD PROPERTY STRINGS "17" "20" "23" "26")
+
 option(${PROJECT_NAME}_INSTALL_MANUALS "Install manuals" ${${PROJECT_NAME}_DEFAULT_VAL})
-option(${PROJECT_NAME}_BUILD_I18N_DLLS "Build i18n runtime dlls" ON)
-set(additional_parts TESTS FUZZERS EXAMPLES BENCHMARKS)
+option(${PROJECT_NAME}_BUILD_I18N_DLLS "Build i18n runtime dlls" OFF)
+set(additional_parts TESTS FUZZING EXAMPLES BENCHMARKS)
 foreach(PART ${additional_parts})
   string(TOLOWER ${PART} part_lowercase)
   option(${PROJECT_NAME}_ENABLE_${PART} "Enable ${part_lowercase}" ${${PROJECT_NAME}_DEFAULT_VAL})
@@ -46,8 +52,23 @@ foreach(PART ${additional_parts})
     option(${PROJECT_NAME}_ENABLE_${PART}_ADD_UBSAN
            "Build ${part_lowercase} with undefined behaviour sanitizer" OFF
     )
+    option(${PROJECT_NAME}_ENABLE_${PART}_EXPERIMENTAL "IF
+    ${PROJECT_NAME}_ENABLE_${PART} is enabled, build something, that maybe cannot be compiled." NO
+    )
   endif()
 endforeach()
+option(${PROJECT_NAME}_CRYPTOPP_CMAKE "If ${PROJECT_NAME}_ENABLE_EXAMPLES is
+turned on, download cryptopp-cmake or try find local cryptopp via *.pc files." NO
+)
+option(${PROJECT_NAME}_TEST_TRY_BOOST_UUID "If ${PROJECT_NAME}_ENABLE_TESTS is
+turned on, try build some tests with Boost::uuid" NO
+)
+option(${PROJECT_NAME}_ENABLE_BENCHMARKS_DRAGONBOX "If
+${PROJECT_NAME}_ENABLE_BENCHMARKS is turned on, try build some benchmarks with
+dragonbox" YES)
+option(${PROJECT_NAME}_ENABLE_BENCHMARKS_MIMALLOC "If
+${PROJECT_NAME}_ENABLE_BENCHMARKS is turned on, try build some benchmarks with
+mimalloc" YES)
 
 file(GLOB_RECURSE ${PROJECT_NAME}_headers CONFIGURE_DEPENDS
      "${CMAKE_CURRENT_SOURCE_DIR}/include/**.h"
@@ -65,7 +86,7 @@ target_include_directories(
                             $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD ${${PROJECT_NAME}_CXX_STANDARD})
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows"
    OR CMAKE_SYSTEM_NAME STREQUAL "Cygwin"
@@ -74,15 +95,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows"
   target_link_libraries(${PROJECT_NAME} PUBLIC ntdll)
 endif()
 
-if(${${PROJECT_NAME}_BUILD_I18N_DLLS})
+if(${${PROJECT_NAME}_ENABLE_I18N_DLLS})
   add_subdirectory(src)
 endif()
 
-if(${${PROJECT_NAME}_BUILD_FUZZERS})
+if(${${PROJECT_NAME}_ENABLE_FUZZERS})
   add_subdirectory(fuzzing)
 endif()
 
-if(${${PROJECT_NAME}_BUILD_BENCHMARKS})
+if(${${PROJECT_NAME}_ENABLE_BENCHMARKS})
   add_subdirectory(benchmark)
 endif()
 
@@ -91,7 +112,7 @@ if(${${PROJECT_NAME}_ENABLE_TESTS})
   add_subdirectory(tests)
 endif()
 
-if(${${PROJECT_NAME}_BUILD_EXAMPLES})
+if(${${PROJECT_NAME}_ENABLE_EXAMPLES})
   add_subdirectory(examples)
 endif()
 
