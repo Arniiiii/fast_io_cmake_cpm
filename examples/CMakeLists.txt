@@ -23,7 +23,7 @@ set(examples_simple
     0000.compile/compile_freestanding.cc
     0000.compile/compile_hosted.cc
     0000.compile/compile_legacy.cc
-    0001.helloworld/examples.cc
+    # 0001.helloworld/examples.cc # error: ‘os_c_str’ is not a member of ‘fast_io’; did you mean ‘fast_io::manipulators::os_c_str’?
     0001.helloworld/helloworld.cc
     # 0001.helloworld/helloworld_android_remote_dbg.cc
     0001.helloworld/helloworld_dbg.cc
@@ -251,6 +251,7 @@ set(examples_todo_cmake
 )
 
 set(examples_experimental
+    0001.helloworld/examples.cc # error: ‘os_c_str’ is not a member of ‘fast_io’; did you mean ‘fast_io::manipulators::os_c_str’?
     0003.manipulators/0x2a_0x_imbue.cc # error: ‘buffer_output_stream’ has not been declared
     0003.manipulators/0x2a_0x_imbue_for_fout.cc # error: ‘buffer_output_stream’ has not been declared
     0006.file_io/ibuf_file.cc # error: ‘transmit’ was not declared in this scope

@@ -91,6 +91,7 @@ set(tests_simple
     # 0024.timestamp/basic_timestamp.cc # error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
     # 0024.timestamp/constexpr.cc # error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
     # 0024.timestamp/context_scan.cc # error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
+    0024.timestamp/fixed.cc
     # 0024.timestamp/iso8601_timestamp.cc # error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
     # 0024.timestamp/overflow.cc # error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
     # 0024.timestamp/roundtrip.cc # error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
