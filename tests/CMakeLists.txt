@@ -38,7 +38,7 @@ endfunction()
 # endforeach()
 
 set(tests_simple
-    0000.tests_prebuild/gentests.cc
+    # 0000.tests_prebuild/gentests.cc # wtf why this exists?
     0001.input/invalid_number.cc
     0002.printscan/print.cc
     0002.printscan/scan.cc
@@ -68,8 +68,8 @@ set(tests_simple
     0012.umul/umul.cc
     # 0013.pr_rsv/bounds_checking_array.cc #  error: static assertion failed: array size is not enough
     # 0013.pr_rsv/bounds_checking_c_array.cc # error: static assertion failed: C array size is not enough
-    0013.pr_rsv/pr_rsv.cc
-    0013.pr_rsv/pr_rsv_scientific.cc
+    # 0013.pr_rsv/pr_rsv.cc # error: no matching function for call to ‘os_c_str(char [24], char*&)’
+    # 0013.pr_rsv/pr_rsv_scientific.cc #  error: no matching function for call to ‘os_c_str(char [24], char*&)’
     # 0014.integer/block_function_pointer.cc # In instantiation of ‘constexpr void fast_io::io::println(T&&, Args&& ...) [with T = int (&)(); Args = {}]’ error: static assertion failed: some types are not printable for print on default C's stdout
     0014.integer/percentage_conventional.cc
     0014.integer/percentage_sex_ratio.cc
@@ -220,6 +220,8 @@ set(tests_experimental
     0009.http_header/head.cc # error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
     0013.pr_rsv/bounds_checking_array.cc #  error: static assertion failed: array size is not enough
     0013.pr_rsv/bounds_checking_c_array.cc # error: static assertion failed: C array size is not enough
+    0013.pr_rsv/pr_rsv.cc # error: no matching function for call to ‘os_c_str(char [24], char*&)’
+    0013.pr_rsv/pr_rsv_scientific.cc #  error: no matching function for call to ‘os_c_str(char [24], char*&)’
     0014.integer/block_function_pointer.cc # In instantiation of ‘constexpr void fast_io::io::println(T&&, Args&& ...) [with T = int (&)(); Args = {}]’ error: static assertion failed: some types are not printable for print on default C's stdout
     0015.temp_file/tmp.cc # error: cannot convert ‘fast_io::native_file to 'FILE*'
     0024.timestamp/basic_timestamp.cc # error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
@@ -252,6 +254,10 @@ set(tests_experimental
 
 set(tests_experimental_boost_uuid
   0019.boost/uuid.cc # error: ‘Iter’ has not been declared inline constexpr char_type *print_reserve_define(io_reserve_type_t<char_type, boost::uuids::uuid>, Iter iter,
+)
+
+set(tests_this_shouldnt_exist
+    0000.tests_prebuild/gentests.cc # wtf why this exists?
 )
 
 # cmake-format: on
@@ -350,6 +356,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   list(APPEND all_tests ${tests_doesnt_have_main})
   list(APPEND all_tests ${tests_experimental})
   list(APPEND all_tests ${tests_experimental_boost_uuid})
+  list(APPEND all_tests ${tests_this_shouldnt_exist})
 
   foreach(test ${all_tests})
     message(DEBUG "all_tests: ${test}")

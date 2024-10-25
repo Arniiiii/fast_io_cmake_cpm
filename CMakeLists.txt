@@ -51,7 +51,7 @@ foreach(PART ${additional_parts})
            OFF
     )
     option(${PROJECT_NAME}_ENABLE_${PART}_ADD_UBSAN
-           "Build ${part_lowercase} with undefined behaviour sanitizer" OFF
+      "Build ${part_lowercase} with undefined behaviour sanitizer" ON
     )
     option(${PROJECT_NAME}_ENABLE_${PART}_EXPERIMENTAL "IF
     ${PROJECT_NAME}_ENABLE_${PART} is enabled, build something, that maybe cannot be compiled." NO

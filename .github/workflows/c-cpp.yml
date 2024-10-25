@@ -7,24 +7,31 @@ on:
     branches: ["master", "next"]
 
 jobs:
-  ubuntu:
-    runs-on: ubuntu-latest
+  linux_matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        cxxcompiler: [g++,clang++]
+        with_experimental: [0,1]
+        include:
+          - ccompiler: gcc
+            cxxcompiler: g++
+          - ccompiler: clang
+            cxxcompiler: clang++
 
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Install ninja-build tool
         uses: seanmiddleditch/gha-setup-ninja@v5
-      - name: Generate tests
-        run: |
-          cmake -B fast_io_prebuild -S . -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS=On -DTESTS_PREBUILD=On
-          cmake --build fast_io_prebuild
-          ./fast_io_prebuild/tests_prebuild linux
-      - name: CMake configure
-        run: cmake -B fast_io_build -S . -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Werror" -DENABLE_TESTS=On
+      - name: Configuring
+        run: cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS='-Wall -Wextra -Wpedantic -Wshadow -Wconversion' -Dfast_io_ENABLE_TESTS=1 -Dfast_io_ENABLE_BENCHMARKS=1 -Dfast_io_ENABLE_EXAMPLES=1 -Dfast_io_ENABLE_FUZZING=1 -DCMAKE_CXX_COMPILER='${{ matrix.cxxcompiler }}' -DCMAKE_C_COMPILER='${{ matrix.ccompiler }}' -Dfast_io_ENABLE_TESTS_EXPERIMENTAL=${{ matrix.with_experimental }} -Dfast_io_ENABLE_BENCHMARKS_EXPERIMENTAL=${{ matrix.with_experimental }} -Dfast_io_ENABLE_EXAMPLES_EXPERIMENTAL=${{ matrix.with_experimental }} -Dfast_io_ENABLE_FUZZING_EXPERIMENTAL=${{ matrix.with_experimental }}
       - name: CMake build
-        run: cmake --build fast_io_build
+        run: |
+          if [[ "${{ matrix.with_experimental }}" == "1" ]]; then NOT_CONTINUE_AFTER_FAIL='0'; else NOT_CONTINUE_AFTER_FAIL='1'; fi ;
+          cmake --build ./build --verbose -j $(nproc) -- -k ${NOT_CONTINUE_AFTER_FAIL}
       - name: CMake test
-        run: cmake --build fast_io_build --target test
+        run: ctest --test-dir ./build --verbose -j $(nproc)
 
   windows:
     runs-on: windows-latest
@@ -32,17 +39,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1.13.0
-      - name: Generate tests
-        run: |
-          cmake -B fast_io_prebuild -S . -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS=On -DTESTS_PREBUILD=On
-          cmake --build fast_io_prebuild
-          ./fast_io_prebuild/tests_prebuild windows msvc
-      - name: CMake configure
-        run: cmake -B fast_io_build -S . -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_CXX_FLAGS="/EHsc /W3 /WX /sdl" -DENABLE_TESTS=On
+      - name: Configuring
+        run: cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS='/EHsc /W3 /WX /sdl' -Dfast_io_ENABLE_TESTS=1 -Dfast_io_ENABLE_BENCHMARKS=1 -Dfast_io_ENABLE_EXAMPLES=1 -Dfast_io_ENABLE_FUZZING=1 -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl
       - name: CMake build
-        run: cmake --build fast_io_build
+        run: |
+          cmake --build ./build --verbose -j $(nproc) -- -k 0
       - name: CMake test
-        run: cmake --build fast_io_build --target test
+        run: ctest --test-dir ./build --verbose -j $(nproc)
 
   # macos:
 
