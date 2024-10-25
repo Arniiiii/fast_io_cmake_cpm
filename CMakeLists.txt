@@ -103,7 +103,7 @@ if(${${PROJECT_NAME}_ENABLE_I18N_DLLS})
   add_subdirectory(src)
 endif()
 
-if(${${PROJECT_NAME}_ENABLE_FUZZERS})
+if(${${PROJECT_NAME}_ENABLE_FUZZING})
   add_subdirectory(fuzzing)
 endif()
 

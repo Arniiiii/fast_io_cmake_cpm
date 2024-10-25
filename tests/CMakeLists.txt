@@ -38,6 +38,7 @@ endfunction()
 # endforeach()
 
 set(tests_simple
+    0000.tests_prebuild/gentests.cc
     0001.input/invalid_number.cc
     0002.printscan/print.cc
     0002.printscan/scan.cc
@@ -81,9 +82,7 @@ set(tests_simple
     0017.error/reject_filename.cc
     0018.operator_support/operator_output.cc
     # 0019.boost/uuid.cc # requires boost::uuid
-    # 0020.scanners/contiguous_line_scanner.cc # error: ‘line_scanner’ was not declared in this scope
     0020.scanners/getline.cc
-    # 0020.scanners/line_scanner.cc # error: ‘line_scanner’ was not declared in this scope
     0021.binary_serialization/le_get32.cc
     0021.binary_serialization/str_get_all.cc
     0022.char_categories/fullwidth.cc
@@ -116,7 +115,7 @@ set(tests_simple
     # 0026.container/0001.vector/insert.cc # error: no matching function for call to ‘fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >::insert(int*&, int, int)’
     # 0026.container/0001.vector/insert_range.cc # error: ‘class fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >’ has no member named ‘insert_range’
     # 0026.container/0001.vector/max_size.cc # error: ‘buffer_output_stream’ has not been declared
-    # 0026.container/0001.vector/operator_assignment.cc # error: no match for ‘operator=’ (operand types are ‘fast_io::vector<int>’ {aka ‘fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >’} and ‘const std::initializer_list<int>’)
+    # 0026.container/0001.vector/operator_assign.cc # error: no match for ‘operator=’ (operand types are ‘fast_io::vector<int>’ {aka ‘fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >’} and ‘const std::initializer_list<int>’)
     0026.container/0001.vector/operator_at.cc
     0026.container/0001.vector/operator_cmp.cc
     0026.container/0001.vector/pop_back.cc
@@ -139,14 +138,21 @@ set(tests_simple
     0026.container/0003.deque/deque_push.cc
     # 0026.container/0003.deque/dequeasm.cc # it doesn't have main
     0026.container/0003.deque/test_deque.cc
+    0026.container/0004.string/append_replace.cc
+    0026.container/0004.string/gotw20/fast_iostring.cc
+    0026.container/0004.string/gotw20/stdstring.cc
+    0026.container/0004.string/string.cc
+    0026.container/0004.string/tefa.cc
     0026.container/0005.stack/test_stack.cc
     0026.container/0006.queue/test_queue.cc
     0026.container/0007.array/test_array.cc
     0026.container/0008.priority_queue/test_priority_queue.cc
+    0026.container/0009.string_view/cstring_view.cc
     0026.container/0009.string_view/string_view.cc
-    0026.container/0010.cstring_view/cstring_view.cc
-    # 0026.container/0011.span/index_span.cc #  error: ‘const class fast_io::containers::index_span<T, N>’ has no member named ‘n’
-    0026.container/0011.span/span.cc
+    # 0026.container/0010.span/index_span.cc #  error: ‘const class fast_io::containers::index_span<T, N>’ has no member named ‘n’
+    0026.container/0010.span/span.cc
+    0026.container/0011.forward_list/forward_list_loop.cc
+    0026.container/0011.forward_list/forward_list_sort.cc
     0026.container/trivialclass.cc
     # 0027.rwreflect/read_some.cc # fatal error: fast_io_core_impl/rwreflect/impl.h: No such file or directory
     # 0027.rwreflect/tall/family.cc # undefined reference to `fakewrite'
@@ -164,6 +170,7 @@ set(tests_simple
     # 0031.tpeb/stdout.cc # windows only?
     0032.process/nt.cc
     0033.legacy/getfd.cc
+    0033.legacy/hackstdoutptr.cc
     0034.string/stringtest.cc
 )
 
@@ -215,8 +222,6 @@ set(tests_experimental
     0013.pr_rsv/bounds_checking_c_array.cc # error: static assertion failed: C array size is not enough
     0014.integer/block_function_pointer.cc # In instantiation of ‘constexpr void fast_io::io::println(T&&, Args&& ...) [with T = int (&)(); Args = {}]’ error: static assertion failed: some types are not printable for print on default C's stdout
     0015.temp_file/tmp.cc # error: cannot convert ‘fast_io::native_file to 'FILE*'
-    0020.scanners/contiguous_line_scanner.cc # error: ‘line_scanner’ was not declared in this scope
-    0020.scanners/line_scanner.cc # error: ‘line_scanner’ was not declared in this scope
     0024.timestamp/basic_timestamp.cc # error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
     0024.timestamp/constexpr.cc # error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
     0024.timestamp/context_scan.cc # error: call of overloaded ‘find_not(const char*&, const char*&, const char&)’ is ambiguous
@@ -230,13 +235,13 @@ set(tests_experimental
     0026.container/0001.vector/insert.cc # error: no matching function for call to ‘fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >::insert(int*&, int, int)’
     0026.container/0001.vector/insert_range.cc # error: ‘class fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >’ has no member named ‘insert_range’
     0026.container/0001.vector/max_size.cc # error: ‘buffer_output_stream’ has not been declared
-    0026.container/0001.vector/operator_assignment.cc # error: no match for ‘operator=’ (operand types are ‘fast_io::vector<int>’ {aka ‘fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >’} and ‘const std::initializer_list<int>’)
+    0026.container/0001.vector/operator_assign.cc # error: no match for ‘operator=’ (operand types are ‘fast_io::vector<int>’ {aka ‘fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >’} and ‘const std::initializer_list<int>’)
     0026.container/0001.vector/reserve.cc # error: no type named ‘handle_type’ in ‘using fast_io::typed_generic_allocator_adapter<NAlloc, int>::allocator_adaptor = struct NAlloc’ {aka ‘struct NAlloc’}
     0026.container/0001.vector/resize.cc # error: converting to ‘fast_io::vector<int>’ {aka ‘fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >’} from initializer list would use explicit constructor ‘constexpr fast_io::containers::vector<T, allocator>::vector(std::initializer_list<_Tp>) [with T = int; allocator = fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator>]
     0026.container/0001.vector/shrink_to_fit.cc # error: ‘fast_io::vector<int>’ {aka ‘class fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >’} has no member named ‘resize’;
     0026.container/0001.vector/swap.cc # error: ‘fast_io::vector<int>’ {aka ‘class fast_io::containers::vector<int, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >’} has no member named ‘swap’
     0026.container/0001.vector/vector.cc # error: no matching function for call to ‘fast_io::containers::vector<std::__cxx11::basic_string<char>, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >::vector(fast_io::containers::vector<std::__cxx11::basic_string<char>, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >::iterator, fast_io::containers::vector<std::__cxx11::basic_string<char>, fast_io::generic_allocator_adapter<fast_io::c_malloc_allocator> >::iterator)’
-    0026.container/0011.span/index_span.cc #  error: ‘const class fast_io::containers::index_span<T, N>’ has no member named ‘n’
+    0026.container/0010.span/index_span.cc #  error: ‘const class fast_io::containers::index_span<T, N>’ has no member named ‘n’
     0027.rwreflect/read_some.cc # fatal error: fast_io_core_impl/rwreflect/impl.h: No such file or directory
     0027.rwreflect/tall/family.cc # undefined reference to `fakewrite'
     0027.rwreflect/tall/fmily.cc # error: ‘println_freestanding’ is not a member of ‘fast_io::operations’; did you mean ‘print_freestanding’?

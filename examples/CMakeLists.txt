@@ -121,6 +121,7 @@ set(examples_simple
     0014.random/name.cc
     0014.random/password.cc
     0014.random/pin.cc
+    0014.random/pin6.cc
     0014.random/ranuint64.cc
     0014.random/sexratio.cc
     0014.random/stop_born_child_until_boy.cc
@@ -164,7 +165,7 @@ set(examples_simple
     0032.parse_by_scan/parse_by_scan.cc
     0033.get_fd/cout.cc
     0033.get_fd/coutfp.cc
-    # 0033.pulseaudio/pulseaudio.cc
+    # 0034.pulseaudio/pulseaudio.cc
 )
 
 
@@ -243,7 +244,7 @@ set(examples_wasm_only
 )
 
 set(examples_pulseaudio
-    0033.pulseaudio/pulseaudio.cc
+    0034.pulseaudio/pulseaudio.cc
 )
 
 set(examples_todo_cmake

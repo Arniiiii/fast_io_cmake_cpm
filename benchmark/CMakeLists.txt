@@ -63,7 +63,7 @@ set(benchmarks_simple
     0002.file_io_tsc/time/iobuf_file.cc
     0002.file_io_tsc/time/iobuf_file_be32.cc
     # 0002.file_io_tsc/time/iobuf_file_bin.cc
-    0002.file_io_tsc/time/iobuf_file_concatln.cc
+    0002.file_io_tsc/time/iobuf_file_concatln_std.cc
     # 0002.file_io_tsc/time/iobuf_file_l10n.cc
     0002.file_io_tsc/time/iobuf_file_le32.cc
     0002.file_io_tsc/time/iobuf_file_leb128.cc
@@ -107,11 +107,13 @@ set(benchmarks_simple
     0006.random/password/mt19937_64.cc
     0006.random/password/random_device.cc
     # 0007.concat/concat_cstring.cc
+    0007.concat/concat_fast_io.cc
     # 0007.concat/concat_hstring.cc
     # 0007.concat/concat_qstring.cc
     # 0007.concat/concat_std.cc
-    # 0007.concat/concat_string.cc
     0007.concat/concat_vs_format.cc # requires or std::format or fmtlib.
+    0007.concat/u32concat_fast_io.cc
+    0007.concat/u32concat_std.cc
     # 0007.concat/to_hstring.cc
     0008/seperate/charconv.cc
     # 0008/seperate/charconv_no_c_str.cc
@@ -123,15 +125,14 @@ set(benchmarks_simple
     # 0008/seperate_short/charconv_no_c_str.cc
     # 0008/seperate_short/dragonbox_no_c_str.cc
     # 0008/seperate_short/fast_io_no_c_str.cc
-    0009.concatstring/concat.cc
+    0009.concatstring/concat_fast_io.cc
+    0009.concatstring/concat_std.cc
     0009.concatstring/format.cc
     0009.concatstring/stringstream.cc
     0009.concatstring/tostring.cc
-    # 0010.line/contiguous_line_scanner.cc
     0010.line/getline.cc
     0010.line/line_get.cc
     0010.line/line_get_fbf.cc
-    # 0010.line/line_scanner.cc
     0010.line/random_data.cc
     # 0010.line/scan_qstring.cc
     # 0010.line/scan_qstring_u16utf8.cc
@@ -143,6 +144,21 @@ set(benchmarks_simple
     0011.containers/list/0002.multi_push_back/fast_io.cc
     0011.containers/list/0002.multi_push_back/std.cc
     # 0011.containers/list/0002.multi_push_back/std_mimalloc.cc
+    0011.containers/string/0000.vector_string/string_push_back_fast_io.cc
+    0011.containers/string/0000.vector_string/string_push_back_fast_io_empty.cc
+    0011.containers/string/0000.vector_string/string_push_back_fast_io_long.cc
+    0011.containers/string/0000.vector_string/string_push_back_fast_io_middle.cc
+    0011.containers/string/0000.vector_string/string_push_back_std.cc
+    0011.containers/string/0000.vector_string/string_push_back_std_empty.cc
+    0011.containers/string/0000.vector_string/string_push_back_std_long.cc
+    0011.containers/string/0000.vector_string/string_push_back_std_middle.cc
+    0011.containers/string/0000.vector_string/u32string_push_back_fast_io.cc
+    0011.containers/string/0000.vector_string/u32string_push_back_fast_io_middle.cc
+    0011.containers/string/0000.vector_string/u32string_push_back_std.cc
+    0011.containers/string/0000.vector_string/u32string_push_back_std_middle.cc
+    0011.containers/string/0001.string_push_back/fast_io.cc
+    0011.containers/string/0001.string_push_back/fast_io_unchecked.cc
+    0011.containers/string/0001.string_push_back/std.cc
     0011.containers/vector/0000.initialization/fast_io.cc
     0011.containers/vector/0000.initialization/std.cc
     0011.containers/vector/0001.push_back/fast_io.cc
@@ -257,13 +273,10 @@ set(benchmarks_experimental
     0004.file_io_floating/general_l10n.cc # error: ‘buffer_output_stream’ has not been declared
     0005.time/fast_io.cc # error: ‘buffer_output_stream’ has not been declared
     0007.concat/concat_std.cc #  error: ‘concatln_std’ is not a member of ‘fast_io’
-    0007.concat/concat_string.cc # error: ‘concatln’ is not a member of ‘fast_io’
     0008/seperate/charconv_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
     0008/seperate/fast_io_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
     0008/seperate_short/charconv_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
     0008/seperate_short/fast_io_no_c_str.cc # error: cannot convert ‘fast_io::obuf_file’ to 'int'
-    0010.line/contiguous_line_scanner.cc # error: ‘line_scanner’ was not declared in this scope
-    0010.line/line_scanner.cc # error: ‘line_scanner’ was not declared in this scope
     0010.line/scan_u16string_u16utf8.cc # error: ‘u16iutf8_file’ is not a member of ‘fast_io’
     0011.containers/list/0000.algos/fast_io.cc # error: no matching function for call to ::fast_io::list<::std::size_t> lst(vec.begin(),vec.end());
     0014.codecvt/u16utf8_file.cc # error: ‘u16outf8_file’ is not a member of ‘fast_io’
